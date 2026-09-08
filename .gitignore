@@ -1,0 +1,23 @@
+# npm cache
+/.npm-cache/
+
+# Python environment and generated files
+/backend/.venv/
+__pycache__/
+*.pyc
+
+# pytest caches and temporary files
+.pytest_cache/
+pytest-cache-files-*/
+
+# Frontend dependencies and generated output
+/frontend/node_modules/
+/frontend/dist/
+/frontend/dist-ssr/
+/frontend/coverage/
+/frontend/.eslintcache
+
+# Downloaded Node.js setup artifacts
+/node-v24.20.0-x64.msi
+/node-v24.20.0-install.log
+/SHASUMS256-v24.20.0.txt
