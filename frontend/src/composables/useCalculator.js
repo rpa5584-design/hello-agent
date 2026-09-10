@@ -9,6 +9,8 @@ export function useCalculator(request = calculate) {
   const busy = ref(false)
   const error = ref('')
   const hasResult = ref(false)
+  const history = ref([])
+  let historyId = 0
   const symbols = { add: '+', subtract: '−', multiply: '×', divide: '÷' }
   const caption = computed(() => error.value ? 'Try again' : busy.value ? 'Calculating…'
     : operation.value ? `${stored.value} ${symbols[operation.value]}`
@@ -52,6 +54,7 @@ export function useCalculator(request = calculate) {
       if (!Number.isFinite(value)) throw new Error('Result is outside the supported range.')
       entry.value = String(value)
       hasResult.value = true
+      history.value = [{ id: ++historyId, expression: `${left} ${symbols[name]} ${right}`, result: value }, ...history.value].slice(0, 3)
       return value
     } catch (failure) {
       error.value = failure instanceof Error ? failure.message : 'Calculation failed.'
@@ -92,5 +95,5 @@ export function useCalculator(request = calculate) {
     replaceEntry.value = false
   }
 
-  return { entry, operation, busy, error, caption, clear, digit, toggleSign, chooseOperation, equals, percent }
+  return { entry, operation, busy, error, caption, history, clear, digit, toggleSign, chooseOperation, equals, percent }
 }

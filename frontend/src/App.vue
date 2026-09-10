@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted } from 'vue'
 import { useCalculator } from './composables/useCalculator.js'
 
-const { entry, operation, busy, error, caption, clear, digit, toggleSign, chooseOperation, equals, percent } = useCalculator()
+const { entry, operation, busy, error, caption, history, clear, digit, toggleSign, chooseOperation, equals, percent } = useCalculator()
 const keys = [
   { label: 'AC', name: 'All clear', kind: 'function', action: clear },
   { label: '+/−', name: 'Change sign', kind: 'function', action: toggleSign },
@@ -50,6 +50,17 @@ onUnmounted(() => window.removeEventListener('keydown', keyboard))
       <div class="keypad" aria-label="Calculator keypad">
         <button v-for="key in keys" :key="key.label" type="button" class="key" :class="[key.kind, { selected: key.operation && operation === key.operation }]" :aria-label="key.name || key.label" :aria-pressed="key.operation ? operation === key.operation : undefined" :disabled="busy" @click="activate(key)">{{ key.label }}</button>
       </div>
+      <section class="history" aria-labelledby="history-heading">
+        <h2 id="history-heading">Calculation history</h2>
+        <p class="history-note">Last 3 calculations · newest first</p>
+        <ol v-if="history.length" aria-label="Recent calculations" aria-live="polite">
+          <li v-for="item in history" :key="item.id">
+            <span>{{ item.expression }}</span>
+            <strong>= {{ item.result }}</strong>
+          </li>
+        </ol>
+        <p v-else class="history-empty">Your completed calculations will appear here.</p>
+      </section>
     </section>
   </main>
 </template>
@@ -83,6 +94,16 @@ onUnmounted(() => window.removeEventListener('keydown', keyboard))
 .key:active:not(:disabled) { transform: scale(.94); }
 .key:focus-visible { outline: 3px solid #ffd28c; outline-offset: 3px; }
 .key:disabled { opacity: .6; cursor: wait; }
+.history { margin-top: 22px; padding: 18px 4px 4px; border-top: 1px solid #444442; }
+.history h2 { margin: 0; font-size: 16px; font-weight: 500; }
+.history-note, .history-empty { color: #aaa9a5; font-size: 12px; line-height: 1.5; }
+.history-note { margin: 5px 0 12px; }
+.history-empty { margin: 0; }
+.history ol { list-style: none; padding: 0; margin: 0; }
+.history li { display: grid; gap: 4px; padding: 10px 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.history li + li { border-top: 1px solid #333331; }
+.history li span { color: #c4c4bf; font-size: 14px; }
+.history li strong { color: #ffbd61; text-align: right; font-size: 20px; font-weight: 400; }
 @media (max-width: 350px) { .key { font-size: 24px; } .key.function { font-size: 22px; } .key.operator { font-size: 29px; } .key.zero { padding-left: 24px; } }
 @media (prefers-reduced-motion: reduce) { .key { transition: none; } }
 </style>
