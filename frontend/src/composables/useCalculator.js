@@ -54,7 +54,7 @@ export function useCalculator(request = calculate) {
       if (!Number.isFinite(value)) throw new Error('Result is outside the supported range.')
       entry.value = String(value)
       hasResult.value = true
-      history.value = [{ id: ++historyId, expression: `${left} ${symbols[name]} ${right}`, result: value }, ...history.value].slice(0, 3)
+      history.value = [{ id: ++historyId, expression: `${left} ${symbols[name]} ${right}`, result: value }, ...history.value].slice(0, 5)
       return value
     } catch (failure) {
       error.value = failure instanceof Error ? failure.message : 'Calculation failed.'

@@ -65,14 +65,14 @@ test('failed requests recover on new entry and pending requests block duplicate 
   assert.equal(calculator.entry.value, '4')
 })
 
-test('history retains the last three successes, survives clear, and excludes failures', async () => {
+test('history retains the last five successes, survives clear, and excludes failures', async () => {
   let result = 0
   const calculator = useCalculator(async () => {
-    if (result === 4) throw new Error('Request failed')
+    if (result === 6) throw new Error('Request failed')
     return ++result
   })
   assert.deepEqual(calculator.history.value, [])
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 6; i++) {
     calculator.clear()
     calculator.digit(String(i))
     await calculator.chooseOperation('add')
@@ -80,11 +80,11 @@ test('history retains the last three successes, survives clear, and excludes fai
     await calculator.equals()
   }
   assert.deepEqual(calculator.history.value.map(({ expression, result }) => [expression, result]), [
-    ['4 + 0', 4], ['3 + 0', 3], ['2 + 0', 2],
+    ['6 + 0', 6], ['5 + 0', 5], ['4 + 0', 4], ['3 + 0', 3], ['2 + 0', 2],
   ])
   calculator.clear()
   await calculator.chooseOperation('divide')
   await calculator.equals()
   assert.equal(calculator.error.value, 'Request failed')
-  assert.deepEqual(calculator.history.value.map(item => item.result), [4, 3, 2])
+  assert.deepEqual(calculator.history.value.map(item => item.result), [6, 5, 4, 3, 2])
 })

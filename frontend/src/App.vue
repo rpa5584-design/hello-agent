@@ -52,7 +52,7 @@ onUnmounted(() => window.removeEventListener('keydown', keyboard))
       </div>
       <section class="history" aria-labelledby="history-heading">
         <h2 id="history-heading">Calculation history</h2>
-        <p class="history-note">Last 3 calculations · newest first</p>
+        <p class="history-note">Last 5 calculations · newest first</p>
         <ol v-if="history.length" aria-label="Recent calculations" aria-live="polite">
           <li v-for="item in history" :key="item.id">
             <span>{{ item.expression }}</span>
