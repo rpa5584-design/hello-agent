@@ -1,6 +1,10 @@
-# Project rules
+# RoomTour project rules
 
 ## Scope
+
+- RoomTour Part 1 is a local hotel-name search application using Vue, Python, and FastAPI.
+- Read the supplied backend CSVs and join hotels and trips using `hotel_id`; show one results row per listed stay.
+- Preserve the supplied CSV data. Do not add booking, live inventory, or other features outside the requested scope.
 
 - Keep backend code in `backend/` and frontend code in `frontend/`.
 - Keep changes focused on the requested task; do not modify unrelated files.
@@ -44,12 +48,12 @@ Trigger: When the user says "Run the smoke test", verify the working application
 
 1. Read `AGENTS.md`, `README.md`, and `docs/verification.md`.
 2. Run the backend pytest suite.
-3. Run the frontend lint and production build.
+3. Run `node --test tests/*.test.js` from `frontend/`, then frontend lint and production build. For this no-source-change macro, use `node node_modules/oxlint/bin/oxlint .` and `node node_modules/eslint/bin/eslint.js .` without fix/cache flags; `npm run lint` auto-fixes files.
 4. Check the intended backend and frontend ports. Never stop an unrelated process.
 5. Start only the backend and frontend processes needed for this test in Codex-managed terminals.
-6. Verify one successful API request and division-by-zero handling.
-7. Use automated browser control to operate the visible calculator through all four operation buttons. With inputs 7 and 6, confirm Add displays 13, Subtract displays 1, and Multiply displays 42. Click Clear inputs and confirm both inputs are empty while Result: 42 remains visible. Enter 8 and 2, confirm Divide displays 4, then click Reset calculator and confirm both inputs and the displayed result are cleared.
-8. Confirm that the result and error states are visually distinct, keyboard focus is visible, the layout remains usable at narrow and wide viewport sizes, and the browser displays no application error. Report any UI behavior that could not be tested.
+6. Verify `/api/health`, a Harbor stay search returning T001 and T009, no matches returning an empty stays array, and blank/missing hotel names returning HTTP 422.
+7. Use automated browser control to verify the RoomTour heading/title, labelled hotel-name input, Search button, seven table columns, and both Harbor stays. Search for a nonexistent hotel and confirm the completed no-results message. Confirm a subsequent successful search replaces it.
+8. Check loading and request-error states, keyboard focus, narrow and wide layouts, and browser application errors. Report anything not tested; do not stop unrelated services to simulate errors.
 9. Unless the user asks to keep the app running, stop only the processes created by this smoke test.
 10. Report concise evidence from tests, builds, endpoints, the automated UI interaction, and service cleanup.
 

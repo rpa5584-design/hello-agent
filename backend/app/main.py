@@ -1,9 +1,11 @@
 from fastapi import FastAPI, HTTPException
 
 from app.calculator import DivisionByZeroError, add, divide, multiply, subtract
+from app.travel_routes import router as travel_router
 
 
-app = FastAPI(title="Hello Agent API")
+app = FastAPI(title="RoomTour API")
+app.include_router(travel_router)
 
 
 @app.get("/api/health")

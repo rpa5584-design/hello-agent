@@ -1,74 +1,68 @@
-# Hello Agent
+# RoomTour
 
-Hello Agent is a small full-stack calculator with a FastAPI backend and a Vue frontend. The backend owns calculation rules and API paths; the frontend owns input and presentation.
+RoomTour is the Assignment 1 Part 1 local hotel-stay search application, adapted from the course calculator project. Vue 3 provides the interface, Python reads the supplied CSV files, and FastAPI connects them. Enter a hotel name and select Search to see matching hotels and listed stays in a plain table.
 
-## Project structure
+## Current structure
 
-```text
-hello-agent/
-├── backend/          # FastAPI application
-│   ├── app/
-│   │   ├── calculator.py
-│   │   └── main.py
-│   ├── tests/
-│   └── requirements.txt
-├── frontend/         # Vue application powered by Vite
-│   ├── src/
-│   │   ├── api/calculator.js
-│   │   ├── App.vue
-│   │   └── main.js
-│   ├── index.html
-│   ├── package.json
-│   └── vite.config.js
-└── AGENTS.md          # Project conventions for coding agents
-```
+The project is located at `C:\Users\alana\Desktop\RoomTour`.
 
-## Setup
+- `frontend/src/App.vue`: search form and loading, error, and no-match messages.
+- `frontend/src/components/HotelStaysTable.vue`: results table.
+- `frontend/src/composables/useHotelSearch.js`: search state.
+- `frontend/src/api/travel.js`: HTTP access.
+- `backend/app/main.py`: FastAPI entry point and router registration.
+- `backend/app/travel_routes.py`: stay-search route.
+- `backend/app/travel.py`: CSV loading and hotel/trip join.
+- `backend/data/`: supplied hotels.csv and trips.csv.
+- `backend/tests/`, `frontend/tests/`: travel tests and retained calculator regression tests.
+- `docs/design.md`, `docs/verification.md`: design and verification.
+- `prompts/part1-selected.md`, `handoffs/current.md`: project context.
 
-Dependencies are installed locally in `backend/.venv` and `frontend/node_modules`.
+Legacy calculator modules and endpoints remain, but the visible interface is RoomTour.
 
-### Backend
+## Local setup and launch
+
+Existing dependencies are in `backend/.venv` and `frontend/node_modules`. No dependencies were added for Part 1. On a fresh checkout, create a Python virtual environment and install `backend/requirements.txt`, and use `npm ci` in `frontend/`. Keep the supplied CSVs in `backend/data/`. No environment variables are required.
+
+Run in separate PowerShell terminals, starting from the project root:
 
 ```powershell
 cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-uvicorn app.main:app --reload
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
-
-The API will be available at `http://localhost:8000`. Each calculator endpoint accepts numeric query parameters named `a` and `b` and returns JSON:
-
-```text
-GET /api/add?a=2&b=3
-GET /api/subtract?a=7&b=4
-GET /api/multiply?a=6&b=5
-GET /api/divide?a=8&b=2
-```
-
-A successful response has the form `{"result": 5.0}`. Division by zero returns HTTP 400 with `{"detail": "Cannot divide by zero."}`.
-
-Run the backend checks with:
 
 ```powershell
-cd backend
+cd frontend
+npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
+```
+
+Open http://127.0.0.1:5173/ . FastAPI documentation is at http://127.0.0.1:8000/docs . Vite proxies `/api` to the backend. Check ports before launching; do not stop unrelated processes.
+
+## Data and API
+
+- `hotels.csv`: `hotel_id,hotel_name,city,state,nightly_rate_usd` (8 hotels).
+- `trips.csv`: `trip_id,hotel_id,trip_name,check_in,check_out` (12 stays).
+
+Python reads both files on each search using paths relative to the backend code. Trips join to hotels by `hotel_id`. Each trip produces one row, so a hotel may appear more than once. Trip rows describe listed stays, not live availability or booking inventory.
+
+`GET /api/stays?hotel_name=Harbor` performs a case-insensitive partial hotel-name search, trimming surrounding whitespace. It returns `{"stays": [...]}`. Each record contains `hotel_id`, `hotel_name`, `city`, `state`, `nightly_rate_usd` (number), `trip_id`, `trip_name`, `check_in`, and `check_out`. Dates use `YYYY-MM-DD`. Harbor returns T001 and T009 for Harbor Lantern Hotel.
+
+No matches return HTTP 200 with `{"stays": []}`. Missing or blank hotel names return HTTP 422. The frontend shows Hotel name, City, State, Stay name, Check-in, Check-out, and Nightly rate (USD). It distinguishes loading, failed requests, and completed searches with no matches.
+
+## Verification
+
+From `backend/`:
+
+```powershell
 .\.venv\Scripts\python.exe -m pytest -p no:cacheprovider tests
 ```
 
-### Frontend
+From `frontend/`:
 
 ```powershell
-cd frontend
-npm install
-npm run dev
-```
-
-The frontend development server will be available at `http://localhost:5173` and proxies `/api` requests to the backend.
-
-Run the frontend checks with:
-
-```powershell
-cd frontend
+node --test tests/*.test.js
 npm run lint
 npm run build
 ```
+
+The lint script auto-fixes; inspect its diff afterward. See `docs/verification.md` for read-only lint commands, observed results, and outstanding browser checks.
