@@ -1,11 +1,41 @@
-# RoomTour Part 1 design
+# RoomTour Part 2 design
 
-RoomTour uses the existing Vue 3 Composition API frontend and Python/FastAPI backend. The frontend sends HTTP requests through Vite's `/api` proxy; it does not read CSV data itself.
+RoomTour retains Part 1 hotel search and adds simulated booking CRUD with SQLite. Vue calls FastAPI through Vite's /api proxy.
 
-`App.vue` provides a labelled hotel-name input and Search button. `useHotelSearch.js` trims the query, rejects blank input, clears old results, and manages loading, success, no-match, and request-error states. `api/travel.js` sends the encoded query to `GET /api/stays?hotel_name=...`.
+## MVC responsibilities
 
-FastAPI registers a focused travel router. The Python search module reads `backend/data/hotels.csv` and `backend/data/trips.csv` on each request using the standard csv module. Paths are relative to the backend code. Hotels are indexed by `hotel_id`; each trip uses that key to retrieve its hotel. Matching is case-insensitive substring matching against `hotel_name`.
+- **Models -> data/entities:** backend/app/models.py defines User, Booking, BookingHistoryItem, and validated creation/cancellation requests. HotelStay remains in travel.py.
+- **Vue View -> interface:** App.vue composes UserSelector, HotelStaysTable, BookingHistory, and ActionFeedback. Composables manage user selection, search/history, pending operations, and feedback; API modules make HTTP calls.
+- **Database controllers -> CRUD:** controllers/booking_controller.py lists users, validates references, creates bookings, joins history, cancels records, and deletes generated test bookings. SQL values are parameterized and mutations use managed transactions.
+- **FastAPI -> thin HTTP layer:** booking_routes.py validates requests and delegates database work. Missing records map to 404, protected deletion to 403, invalid requests to 422. main.py initializes SQLite and registers routers.
 
-The response is `{"stays": [...]}`, one record per matching trip in CSV order. Hotel fields are hotel_id, hotel_name, city, state, nightly_rate_usd; trip fields are trip_id, hotel_id, trip_name, check_in, check_out. The shared hotel_id appears once in the joined record. The UI uses trip_id as its row key and displays seven labelled columns, omitting internal IDs. Rates are formatted as USD and dates retain their CSV format.
+## SQLite data
 
-An empty successful response produces the no-results message. Failed requests produce an error instead. No booking, persistence, live room availability, date filtering, or total-price calculation is included. Supplied CSV integrity was inspected; comprehensive malformed-data handling is not implemented. Existing calculator code remains for regression coverage. No dependencies were added.
+**Hotel -> Trip -> Booking <- User**
+
+| Table | Primary key | Other columns |
+|---|---|---|
+| hotels | hotel_id | hotel_name, city, state, nightly_rate_usd |
+| trips | trip_id | hotel_id, trip_name, check_in, check_out |
+| users | user_id | display_name |
+| bookings | booking_id | user_id, trip_id, booked_on, status |
+
+Foreign keys: trips.hotel_id -> hotels.hotel_id; bookings.trip_id -> trips.trip_id; bookings.user_id -> users.user_id. A trip belongs to one hotel; a booking references one trip and one user. All columns are required. Dates remain YYYY-MM-DD text; rates are numeric; statuses are confirmed/cancelled.
+
+database.py and seed.py create and seed the four tables in one transaction at first initialization, recording success with SQLite user_version. Later starts reuse the database; empty tables do not trigger reseeding. A failed import rolls back. Existing unsupported/uninitialized files require explicit recovery, not automatic reseeding. Application connections enforce foreign keys and close after use.
+
+Instructor IDs stay unchanged. New IDs use B- plus a UUID with bounded collision retries. Creation sets today's date and confirmed status. Cancellation is repeatable and retains history. Deletion accepts the generated ID format only, protecting starter bookings.
+
+## Preserved behavior
+
+Hotel search still reads hotels.csv and trips.csv, joins on hotel_id, and returns one result per matching trip. Its existing response and matching behavior are unchanged.
+
+Demo-user selection controls booking creation and history. History includes joined hotel/trip details and both statuses. Create refreshes history, Cancel updates the retained record, and successful Delete removes it. Pending actions prevent duplicate submissions; stale history requests cannot overwrite another user's results.
+
+## UI Research direction
+
+Embedded-browser research inspected Expedia, Priceline, and Booking.com. Adopted patterns include prominent grouped search controls, clear hotel/stay/price hierarchy, visible actions, and separate trip-management sections.
+
+The redesign uses compact RoomTour branding, a labelled demo-user area, Find a stay, and readable search results retaining seven data columns plus Book stay. History cards emphasize hotel/stay/dates and use smaller visible booking IDs. Confirmed/Cancelled badges combine text, symbols, and styling. Cancel and Delete remain distinct; delete confirmation names the stay and offers Keep booking and Confirm delete. Feedback stays near related controls. Narrow layouts stack controls/cards; results retain a focusable horizontal scroll region.
+
+Demo users, status badges, and test-booking deletion are RoomTour-specific adaptations, not claims about inspected private reference-app booking flows. No authentication, payment, loyalty, surge pricing, live inventory, maps, reviews, extra filters, fake photos, invented prices/availability, or additional travel features were added.

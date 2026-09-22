@@ -2,9 +2,11 @@
 
 ## Scope
 
-- RoomTour Part 1 is a local hotel-name search application using Vue, Python, and FastAPI.
-- Read the supplied backend CSVs and join hotels and trips using `hotel_id`; show one results row per listed stay.
-- Preserve the supplied CSV data. Do not add booking, live inventory, or other features outside the requested scope.
+- RoomTour Part 2 is a local Vue 3, FastAPI, and SQLite application for hotel search and simulated booking CRUD.
+- Preserve Part 1 CSV-based hotel-name search: join hotels and trips by `hotel_id`, with one results row per listed stay.
+- Preserve all four instructor CSVs. Seed SQLite only at first initialization; never reload starter rows or reset the database during ordinary startup or verification.
+- Support demo users, booking creation/history, cancellation retaining records, and generated test-booking deletion. Protect instructor bookings from deletion.
+- Do not add live inventory, authentication, payments, surge pricing, or extra travel features.
 
 - Keep backend code in `backend/` and frontend code in `frontend/`.
 - Keep changes focused on the requested task; do not modify unrelated files.
@@ -15,6 +17,8 @@
 - Use FastAPI and Python type hints.
 - Put the application entry point in `backend/app/main.py`.
 - Group new routes and domain logic into focused modules as the backend grows.
+- Keep entities/request models in models, parameterized transactional CRUD in database controllers, and FastAPI routes thin. Use built-in sqlite3 and enforce foreign keys on each connection.
+- Keep generated database/journal files under backend/data/ ignored by Git. Tests must use isolated databases.
 - Add or update backend tests when behavior changes.
 
 ## Frontend
@@ -52,7 +56,7 @@ Trigger: When the user says "Run the smoke test", verify the working application
 4. Check the intended backend and frontend ports. Never stop an unrelated process.
 5. Start only the backend and frontend processes needed for this test in Codex-managed terminals.
 6. Verify `/api/health`, a Harbor stay search returning T001 and T009, no matches returning an empty stays array, and blank/missing hotel names returning HTTP 422.
-7. Use automated browser control to verify the RoomTour heading/title, labelled hotel-name input, Search button, seven table columns, and both Harbor stays. Search for a nonexistent hotel and confirm the completed no-results message. Confirm a subsequent successful search replaces it.
+7. Use automated browser control to verify RoomTour heading/title, labelled hotel-name input, Search button, seven data columns plus Book stay, and both Harbor stays. Check no results and subsequent search recovery. Verify demo-user selection, history, status labels, and distinct Cancel/Delete controls. Use only disposable generated bookings for a requested CRUD smoke test; preserve instructor rows and existing user bookings.
 8. Check loading and request-error states, keyboard focus, narrow and wide layouts, and browser application errors. Report anything not tested; do not stop unrelated services to simulate errors.
 9. Unless the user asks to keep the app running, stop only the processes created by this smoke test.
 10. Report concise evidence from tests, builds, endpoints, the automated UI interaction, and service cleanup.
