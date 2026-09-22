@@ -1,11 +1,23 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 
+from app.booking_routes import router as booking_router
 from app.calculator import DivisionByZeroError, add, divide, multiply, subtract
+from app.database import initialize_database
 from app.travel_routes import router as travel_router
 
 
-app = FastAPI(title="RoomTour API")
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    initialize_database()
+    yield
+
+
+app = FastAPI(title="RoomTour API", lifespan=lifespan)
 app.include_router(travel_router)
+app.include_router(booking_router)
 
 
 @app.get("/api/health")

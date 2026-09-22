@@ -1,30 +1,14 @@
 # RoomTour
 
-RoomTour is the Assignment 1 Part 1 local hotel-stay search application, adapted from the course calculator project. Vue 3 provides the interface, Python reads the supplied CSV files, and FastAPI connects them. Enter a hotel name and select Search to see matching hotels and listed stays in a plain table.
+RoomTour Assignment 1 Part 2 is a local Vue 3, FastAPI, and SQLite application for hotel-name search and simulated booking CRUD. Select a demo user, search hotels, book a listed stay, read history, cancel while retaining the record, and delete newly generated test bookings. Instructor bookings are protected from deletion. Legacy calculator endpoints remain for regression coverage.
 
-## Current structure
+## Setup and run
 
-The project is located at `C:\Users\alana\Desktop\RoomTour`.
+Project: `C:\Users\alana\Desktop\RoomTour`. Development branch: `part2-sqlite-crud`.
 
-- `frontend/src/App.vue`: search form and loading, error, and no-match messages.
-- `frontend/src/components/HotelStaysTable.vue`: results table.
-- `frontend/src/composables/useHotelSearch.js`: search state.
-- `frontend/src/api/travel.js`: HTTP access.
-- `backend/app/main.py`: FastAPI entry point and router registration.
-- `backend/app/travel_routes.py`: stay-search route.
-- `backend/app/travel.py`: CSV loading and hotel/trip join.
-- `backend/data/`: supplied hotels.csv and trips.csv.
-- `backend/tests/`, `frontend/tests/`: travel tests and retained calculator regression tests.
-- `docs/design.md`, `docs/verification.md`: design and verification.
-- `prompts/part1-selected.md`, `handoffs/current.md`: project context.
+Existing dependencies are in backend/.venv and frontend/node_modules. On a fresh checkout, create a Python virtual environment, install backend/requirements.txt, and run npm ci in frontend/. Use a Node version supported by frontend/package.json. Part 2 uses built-in sqlite3; no additional dependencies or environment variables are required.
 
-Legacy calculator modules and endpoints remain, but the visible interface is RoomTour.
-
-## Local setup and launch
-
-Existing dependencies are in `backend/.venv` and `frontend/node_modules`. No dependencies were added for Part 1. On a fresh checkout, create a Python virtual environment and install `backend/requirements.txt`, and use `npm ci` in `frontend/`. Keep the supplied CSVs in `backend/data/`. No environment variables are required.
-
-Run in separate PowerShell terminals, starting from the project root:
+Keep hotels.csv, trips.csv, users.csv, and bookings.csv in backend/data/. From the project root, run in separate PowerShell terminals:
 
 ```powershell
 cd backend
@@ -36,33 +20,55 @@ cd frontend
 npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-Open http://127.0.0.1:5173/ . FastAPI documentation is at http://127.0.0.1:8000/docs . Vite proxies `/api` to the backend. Check ports before launching; do not stop unrelated processes.
+Open [RoomTour](http://127.0.0.1:5173/). [FastAPI documentation](http://127.0.0.1:8000/docs) is available locally. Vite proxies /api to the backend. Check port ownership before launch; never stop unrelated processes.
 
-## Data and API
+## Data and persistence
 
-- `hotels.csv`: `hotel_id,hotel_name,city,state,nightly_rate_usd` (8 hotels).
-- `trips.csv`: `trip_id,hotel_id,trip_name,check_in,check_out` (12 stays).
+First initialization creates backend/data/roomtour.sqlite3 and seeds all four CSVs in one transaction: 8 hotels, 12 trips, 6 users, and 6 bookings. Instructor IDs and values are preserved; every application database connection enforces foreign keys.
 
-Python reads both files on each search using paths relative to the backend code. Trips join to hotels by `hotel_id`. Each trip produces one row, so a hotel may appear more than once. Trip rows describe listed stays, not live availability or booking inventory.
+Later starts reuse the initialized database without reloading or duplicating starter rows, even when a table is empty. Creation, cancellation, and deletion persist after browser refresh and service restart. The database and journals are ignored by Git; CSVs are never rewritten.
 
-`GET /api/stays?hotel_name=Harbor` performs a case-insensitive partial hotel-name search, trimming surrounding whitespace. It returns `{"stays": [...]}`. Each record contains `hotel_id`, `hotel_name`, `city`, `state`, `nightly_rate_usd` (number), `trip_id`, `trip_name`, `check_in`, and `check_out`. Dates use `YYYY-MM-DD`. Harbor returns T001 and T009 for Harbor Lantern Hotel.
+Existing uninitialized or unsupported databases cause startup to fail rather than silently reseed. Failed first imports roll back tables and rows but leave an uninitialized file. Inspect and back up an existing database before explicit manual recovery. Never delete/reset the database during normal launch or verification.
 
-No matches return HTTP 200 with `{"stays": []}`. Missing or blank hotel names return HTTP 422. The frontend shows Hotel name, City, State, Stay name, Check-in, Check-out, and Nightly rate (USD). It distinguishes loading, failed requests, and completed searches with no matches.
+Part 1 hotel search still reads hotels.csv and trips.csv directly, joins by hotel_id, and returns one row per listed stay. Matching is case-insensitive and partial, trimming surrounding whitespace. Harbor returns T001 and T009; no matches return an empty stays array. These are listed stays, not live inventory.
+
+## API and structure
+
+| Route | Behavior |
+|---|---|
+| GET /api/health | Health status |
+| GET /api/stays?hotel_name=... | Existing hotel search |
+| GET /api/users | Demo users |
+| POST /api/bookings | Create confirmed booking from user_id and trip_id; 201 |
+| GET /api/bookings?user_id=... | Joined history, including both statuses |
+| PATCH /api/bookings/{booking_id} | Accept status cancelled only; retain record |
+| DELETE /api/bookings/{booking_id} | Delete generated test booking; 204 |
+
+Missing records return 404, invalid requests 422, and protected deletion 403. New booking IDs use B- plus a UUID.
+
+- backend/app/main.py: startup and router registration.
+- backend/app/database.py and seed.py: SQLite schema, connections, and one-time seed.
+- backend/app/models.py, controllers/booking_controller.py, and booking_routes.py: models, CRUD, and thin HTTP adapters.
+- backend/app/travel.py and travel_routes.py: preserved CSV-based search.
+- frontend/src/components/: user selection, results, booking history, and feedback.
+- frontend/src/composables/ and api/: interface state and HTTP calls.
+- docs/design.md, docs/verification.md, prompts/part2-selected.md, handoffs/current.md: project context.
 
 ## Verification
 
-From `backend/`:
+From backend/:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -p no:cacheprovider tests
 ```
 
-From `frontend/`:
+From frontend/:
 
 ```powershell
 node --test tests/*.test.js
-npm run lint
+node node_modules/oxlint/bin/oxlint .
+node node_modules/eslint/bin/eslint.js .
 npm run build
 ```
 
-The lint script auto-fixes; inspect its diff afterward. See `docs/verification.md` for read-only lint commands, observed results, and outstanding browser checks.
+These lint commands avoid source changes; npm run lint auto-fixes. Run git diff --check from the root and also review untracked text files. Latest recorded results: 29 frontend tests, 66 backend tests, lint, production build, and whitespace checks passed. See docs/verification.md for manual evidence and limits.

@@ -6,6 +6,10 @@
 __pycache__/
 *.pyc
 
+# Local SQLite database and journal files
+/backend/data/*.sqlite3
+/backend/data/*.sqlite3-*
+
 # pytest caches and temporary files
 .pytest_cache/
 pytest-cache-files-*/
