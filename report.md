@@ -1,52 +1,76 @@
-# RoomTour — Part 1
+# RoomTour — Part 2
 
-## Repository and commit
+## Everything in Part 1
+
+### Repository and commit
 
 Repository: [https://github.com/rpa5584-design/hello-agent](https://github.com/rpa5584-design/hello-agent)
 
-Exact Part 1 implementation commit: `2c513110aa26d171b44f8de1682abf0208c9f7f8`
+- Part 1 implementation checkpoint: `2c513110aa26d171b44f8de1682abf0208c9f7f8`
+- Part 2 reviewed merge commit: `accaa07117b68448005b8b6d62988b6b52c209bf`
+- Part 2 project/demo checkpoint: `5c2d3361326ee419f9e48bc967af417ada65d367`
 
-Commit message: Complete RoomTour Part 1 hotel-stay search
+### Implementation
 
-## Implementation
+Part 1 hotel-name search is preserved. Part 2 seeds SQLite once from `hotels.csv`, `trips.csv`, `users.csv`, and `bookings.csv`. After seeding, application reads and writes use SQLite.
 
-RoomTour uses Vue for the frontend, Python for the backend, and FastAPI between them. The user enters a hotel name and selects Search. The frontend sends the hotel name to `GET /api/stays`. The Python backend reads `backend/data/hotels.csv` and `backend/data/trips.csv`, joins records using `hotel_id`, and returns matching stays through FastAPI. The Vue frontend displays one row per matching stay in a plain table. A completed search with no matches displays a clear no-results message.
+The application uses an MVC structure:
 
-## Verification
+- Models represent data and validation.
+- Vue is the View.
+- Database controllers perform CRUD.
+- FastAPI routes are thin HTTP adapters.
 
-1. Successful search
+The frontend supports all four booking CRUD operations:
 
-   - **Action:** Search for "Harbor Lantern Hotel".
-   - **Expected:** Matching hotel stays appear in the results table.
-   - **Observed:** Two matching stays appeared: "Boston Harbor Weekend" and "Boston Autumn Weekend". The table displayed Hotel name, City, State, Stay name, Check-in, Check-out, and Nightly rate (USD).
+- **Create:** Create a booking.
+- **Read:** Read booking history.
+- **Update:** Change a booking's status to Cancelled while retaining the record.
+- **Delete:** Delete a generated test booking.
 
-2. No-results search
+The UI was improved using research patterns from Expedia, Priceline, and Booking.com without adding out-of-scope features.
 
-   - **Action:** Search for "Nonexistent Hotel".
-   - **Expected:** No result rows appear and a clear no-results message is displayed.
-   - **Observed:** "No matching hotel stays found." was displayed.
+### Verification
 
-The RoomTour heading and browser title were manually verified. Automated verification results:
+Automated verification results:
 
-- Backend test suite: 17 passed.
-- Frontend test suite: 10 passed.
+- Frontend tests: 29 passed.
+- Backend tests: 66 passed.
 - Oxlint and ESLint passed.
 - Production build passed.
 - Git whitespace checks passed.
 
-Repository screenshots at the Part 1 implementation commit:
+Manual verification on final `main`:
 
-- [Successful search](https://github.com/rpa5584-design/hello-agent/blob/2c513110aa26d171b44f8de1682abf0208c9f7f8/docs/part1-success.png)
-- [No-results search](https://github.com/rpa5584-design/hello-agent/blob/2c513110aa26d171b44f8de1682abf0208c9f7f8/docs/part1-no-results.png)
+- Hotel search showed 2 matching Harbor Lantern Hotel stays.
+- Create showed a new Confirmed booking.
+- Read showed the booking in Booking history.
+- Cancel retained the booking as Cancelled.
+- Delete removed the test booking.
+- Changes persisted after browser refresh.
+- Changes persisted after restarting frontend and backend.
+- Starter data did not reload or duplicate.
 
-## Project context and next steps
+[Part 2 screenshot](https://github.com/rpa5584-design/hello-agent/blob/5c2d3361326ee419f9e48bc967af417ada65d367/docs/part2-delete.png)
 
-Project-context files at the submitted Part 1 commit:
+### Project context and next steps
 
-- [README.md](https://github.com/rpa5584-design/hello-agent/blob/2c513110aa26d171b44f8de1682abf0208c9f7f8/README.md)
-- [AGENTS.md](https://github.com/rpa5584-design/hello-agent/blob/2c513110aa26d171b44f8de1682abf0208c9f7f8/AGENTS.md)
-- [Design note](https://github.com/rpa5584-design/hello-agent/blob/2c513110aa26d171b44f8de1682abf0208c9f7f8/docs/design.md)
-- [Selected prompts](https://github.com/rpa5584-design/hello-agent/blob/2c513110aa26d171b44f8de1682abf0208c9f7f8/prompts/part1-selected.md)
-- [Current handoff](https://github.com/rpa5584-design/hello-agent/blob/2c513110aa26d171b44f8de1682abf0208c9f7f8/handoffs/current.md)
+Project-context files at commit `5c2d3361326ee419f9e48bc967af417ada65d367`:
 
-No known blocker remains for the required Part 1 hotel-name search. Some additional non-required browser interaction checks, including keyboard behavior, responsive layout, and loading/error interactions, were not manually rechecked. The next assignment task is Part 2: SQLite CRUD for simulated booking and booking history.
+- [README.md](https://github.com/rpa5584-design/hello-agent/blob/5c2d3361326ee419f9e48bc967af417ada65d367/README.md)
+- [AGENTS.md](https://github.com/rpa5584-design/hello-agent/blob/5c2d3361326ee419f9e48bc967af417ada65d367/AGENTS.md)
+- [docs/design.md](https://github.com/rpa5584-design/hello-agent/blob/5c2d3361326ee419f9e48bc967af417ada65d367/docs/design.md)
+- [docs/verification.md](https://github.com/rpa5584-design/hello-agent/blob/5c2d3361326ee419f9e48bc967af417ada65d367/docs/verification.md)
+- [prompts/part2-selected.md](https://github.com/rpa5584-design/hello-agent/blob/5c2d3361326ee419f9e48bc967af417ada65d367/prompts/part2-selected.md)
+- [handoffs/current.md](https://github.com/rpa5584-design/hello-agent/blob/5c2d3361326ee419f9e48bc967af417ada65d367/handoffs/current.md)
+
+Remaining limitations:
+
+- No optional authentication or surge-pricing bonus was implemented.
+- Next step: submit the completed Part 2 report.md to Canvas.
+
+## Plus, a demo video (under 3 minutes) showing a user interacting with the application.
+
+Duration: **1 minute 43 seconds**.
+
+[Part 2 demo video](https://github.com/rpa5584-design/hello-agent/blob/5c2d3361326ee419f9e48bc967af417ada65d367/docs/part2-demo.mp4)
