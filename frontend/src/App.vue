@@ -4,6 +4,7 @@ import ActionFeedback from './components/ActionFeedback.vue'
 import UserSelector from './components/UserSelector.vue'
 import BookingHistory from './components/BookingHistory.vue'
 import HotelStaysTable from './components/HotelStaysTable.vue'
+import ZipLookupDemo from './components/ZipLookupDemo.vue'
 import { useBookings } from './composables/useBookings.js'
 import { useHotelSearch } from './composables/useHotelSearch.js'
 const { hotelName, stays, loading, error, noResults, search } = useHotelSearch()
@@ -53,6 +54,7 @@ onMounted(loadUsers)
     <BookingHistory :bookings="history" :user-id="selectedUserId" :loading="historyLoading" :loaded="historyLoaded" :pending="pending" :error="historyError" @refresh="loadHistory" @cancel="feedbackArea = 'history'; cancel($event)" @delete="feedbackArea = 'history'; remove($event)">
       <ActionFeedback v-if="feedbackArea === 'history'" :pending="pending" :success="success" :error="bookingError" />
     </BookingHistory>
+    <ZipLookupDemo />
   </main>
 </template>
 

@@ -43,3 +43,34 @@ class BookingHistoryItem(Booking):
     city: str
     state: str
     nightly_rate_usd: float
+
+
+class LiveHotel(BaseModel):
+    """Provider place data, independent of local stays and bookings."""
+
+    place_id: str
+    latitude: float
+    longitude: float
+    name: str | None = None
+    formatted_address: str | None = None
+    locality: str | None = None
+    state: str | None = None
+    postcode: str | None = None
+    country_code: str | None = None
+
+
+class ResolvedZipLocation(BaseModel):
+    postcode: str
+    country_code: str
+    latitude: float
+    longitude: float
+    locality: str | None = None
+
+
+class HotelSearchResponse(BaseModel):
+    requested_zip: str
+    location: ResolvedZipLocation
+    radius_meters: Literal[5000] = 5000
+    hotels: list[LiveHotel]
+    result_limit: int = 100
+    limit_reached: bool = False

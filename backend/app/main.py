@@ -1,11 +1,12 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 
 from app.booking_routes import router as booking_router
-from app.calculator import DivisionByZeroError, add, divide, multiply, subtract
+from app.config import geoapify_key_is_configured
 from app.database import initialize_database
+from app.demo_routes import router as demo_router
 from app.travel_routes import router as travel_router
 
 
@@ -18,33 +19,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(title="RoomTour API", lifespan=lifespan)
 app.include_router(travel_router)
 app.include_router(booking_router)
+app.include_router(demo_router)
 
 
 @app.get("/api/health")
 async def health_check() -> dict[str, str]:
-    return {"status": "ok"}
-
-
-@app.get("/api/add")
-async def add_numbers(a: float, b: float) -> dict[str, float]:
-    return {"result": add(a, b)}
-
-
-@app.get("/api/subtract")
-async def subtract_numbers(a: float, b: float) -> dict[str, float]:
-    return {"result": subtract(a, b)}
-
-
-@app.get("/api/multiply")
-async def multiply_numbers(a: float, b: float) -> dict[str, float]:
-    return {"result": multiply(a, b)}
-
-
-@app.get("/api/divide")
-async def divide_numbers(a: float, b: float) -> dict[str, float]:
-    try:
-        result = divide(a, b)
-    except DivisionByZeroError as error:
-        raise HTTPException(status_code=400, detail=str(error)) from error
-
-    return {"result": result}
+    return {
+        "status": "ok",
+        "geoapify": (
+            "key is configured"
+            if geoapify_key_is_configured()
+            else "key is not configured"
+        ),
+    }

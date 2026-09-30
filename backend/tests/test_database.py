@@ -108,9 +108,17 @@ def test_failed_seed_rolls_back_and_is_not_silently_retried(tmp_path: Path) -> N
 
 def test_application_startup_preserves_database_changes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     database_path = tmp_path / "roomtour.sqlite3"
+    test_key = "test-only-placeholder"
+    monkeypatch.setenv("GEOAPIFY_API_KEY", test_key)
     monkeypatch.setattr("app.main.initialize_database", lambda: initialize_database(database_path))
     with TestClient(app) as client:
-        assert client.get("/api/health").json() == {"status": "ok"}
+        response = client.get("/api/health")
+        assert response.status_code == 200
+        assert response.json() == {
+            "status": "ok",
+            "geoapify": "key is configured",
+        }
+        assert test_key not in response.text
         assert counts(database_path) == EXPECTED_COUNTS
         with connect_database(database_path) as connection:
             connection.execute("UPDATE bookings SET status = 'cancelled' WHERE booking_id = 'B001'")

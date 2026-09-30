@@ -1,12 +1,20 @@
 # RoomTour
 
-RoomTour Assignment 1 Part 2 is a local Vue 3, FastAPI, and SQLite application for hotel-name search and simulated booking CRUD. Select a demo user, search hotels, book a listed stay, read history, cancel while retaining the record, and delete newly generated test bookings. Instructor bookings are protected from deletion. Legacy calculator endpoints remain for regression coverage.
+RoomTour is a local Vue 3, FastAPI, and SQLite application. Assignment 2 Part 1 adds live hotel discovery and a map while preserving the existing hotel-name search and simulated booking CRUD. Select a demo user, search hotels, book a listed stay, read history, cancel while retaining the record, and delete newly generated test bookings. Instructor bookings are protected from deletion.
+
+## Assignment 2 Part 1: Live hotel search and map
+
+Enter a five-digit U.S. ZIP code; leading zeros are preserved. The backend resolves the requested U.S. postcode through Geoapify, then retrieves hotels within 5 km of the resolved point. The hotel list and Leaflet map use the same results, with OpenStreetMap tiles and visible attribution. Selecting a hotel in either view selects the same provider place_id in the other; list controls support keyboard selection.
+
+Live hotels display available provider names and addresses without invented prices, ratings, room availability, or booking claims. Results vary, and the interface discloses when the result limit is reached. Invalid ZIPs, unresolved locations, empty results, and service failures have distinct feedback. New searches clear previous results, map markers, and selection. Existing local hotel search and bookings remain separate and unchanged.
 
 ## Setup and run
 
-Project: `C:\Users\alana\Desktop\RoomTour`. Development branch: `part2-sqlite-crud`.
+Project: `C:\Users\alana\Desktop\RoomTour`. Current branch: `main`.
 
-Existing dependencies are in backend/.venv and frontend/node_modules. On a fresh checkout, create a Python virtual environment, install backend/requirements.txt, and run npm ci in frontend/. Use a Node version supported by frontend/package.json. Part 2 uses built-in sqlite3; no additional dependencies or environment variables are required.
+Existing dependencies are in backend/.venv and frontend/node_modules. On a fresh checkout, create a Python virtual environment, install backend/requirements.txt, and run npm ci in frontend/. Use a Node version supported by frontend/package.json. The existing local booking functionality uses built-in sqlite3. Live hotel discovery requires the Geoapify configuration below.
+
+For Geoapify configuration, place `.env` in the project root beside `frontend/` and `backend/`, with the `GEOAPIFY_API_KEY` setting. The API key remains backend-only; never put it in frontend code or a `VITE_` variable. OpenStreetMap tiles require no private frontend credential. Restart the backend after changing `.env`. Existing process environment variables take precedence. `/api/health` reports application status and whether the key is configured; it never returns the key or contacts Geoapify.
 
 Keep hotels.csv, trips.csv, users.csv, and bookings.csv in backend/data/. From the project root, run in separate PowerShell terminals:
 
@@ -36,7 +44,9 @@ Part 1 hotel search still reads hotels.csv and trips.csv directly, joins by hote
 
 | Route | Behavior |
 |---|---|
-| GET /api/health | Health status |
+| GET /api/health | Application health and safe Geoapify configuration status |
+| GET /api/demo/zip-location?zip_code=... | Resolve a five-digit U.S. ZIP; defaults to 16802 when omitted |
+| GET /api/demo/hotels?zip_code=... | Resolve the ZIP and return provider hotels within 5 km |
 | GET /api/stays?hotel_name=... | Existing hotel search |
 | GET /api/users | Demo users |
 | POST /api/bookings | Create confirmed booking from user_id and trip_id; 201 |
@@ -71,4 +81,4 @@ node node_modules/eslint/bin/eslint.js .
 npm run build
 ```
 
-These lint commands avoid source changes; npm run lint auto-fixes. Run git diff --check from the root and also review untracked text files. Latest recorded results: 29 frontend tests, 66 backend tests, lint, production build, and whitespace checks passed. See docs/verification.md for manual evidence and limits.
+These lint commands avoid source changes; npm run lint auto-fixes. Run git diff --check from the root and also review untracked text files. Latest verification (September 29, 2026): 139 backend tests and 47 frontend tests passed; both non-fixing linters, production build, and whitespace checks passed. One existing Starlette/httpx deprecation warning remains. See docs/verification.md for manual evidence and limits.

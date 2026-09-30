@@ -64,3 +64,33 @@ Trigger: When the user says "Run the smoke test", verify the working application
 ## Combined trigger
 
 When the user says "AutoLoop: run the smoke test", run the SmokeTest macro. If an in-scope check fails, use the AutoLoop rules to make the smallest correction and repeat the smoke test until it passes, five correction cycles are exhausted, or a stopping condition is reached.
+
+## Instructor Feedback Rules
+
+### Repository cleanup
+
+- Do not leave unrelated calculator API code or unused starter code in the final project.
+- Before deleting anything, inspect references and dependencies. Remove only files, routes, or components confirmed unrelated to RoomTour.
+- Preserve all working RoomTour functionality.
+
+### Verification evidence
+
+- Do not report only the steps performed. For every important verification, record the input or action, expected result, observed result, pass/fail, and any correction or remaining limitation.
+
+### Persistence verification
+
+- Whenever a feature is supposed to persist data, verify it after both a browser refresh and a backend/server restart.
+- Record the observed result after each refresh or restart. Do not claim persistence unless it was actually observed.
+
+### Demo evidence
+
+- Demonstration videos and reports must show or describe actual observed behavior, not only planned checks.
+- Verification claims must match what was actually tested.
+
+### Existing course rules remain in effect
+
+- Preserve MVC responsibilities.
+- Keep private API keys in backend `.env` only; never expose them in frontend code or variables.
+- Follow CHECK → TAKE ACTION → VERIFY before installing dependencies.
+- Review actual changed files before committing.
+- Preserve existing working behavior.
