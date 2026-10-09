@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1910" viewBox="0 0 1200 1910" role="img" aria-labelledby="title desc">
+<title id="title">RoomTour: Assignment 2 Part 2 early chatbot mockup</title>
+<desc id="desc">Five alternative pre-implementation states: normal input, loading, grounded answer, no match or insufficient data, and error. Illustrative fixture data only. No working chatbot or model calls.</desc>
+<style>text{font-family:Arial,sans-serif;fill:#182f42}.heading{font-size:24px;font-weight:bold}.body{font-size:17px}.small{font-size:14px}.muted{fill:#526575}.bold{font-weight:bold}.white{fill:white}</style>
+<rect width="1200" height="1910" fill="#f3f6f8"/>
+<rect width="1200" height="78" fill="white"/>
+<path d="M0 78H1200" stroke="#d9e2e8"/>
+<rect x="32" y="20" width="38" height="38" rx="10" fill="#184e77"/>
+<text x="44" y="47" class="white heading">R</text>
+<text x="82" y="47" class="heading">RoomTour</text>
+<text x="678" y="45" class="small muted">ASSIGNMENT 2 PART 2 · EARLY CHATBOT DESIGN</text>
+<rect x="32" y="100" width="1136" height="74" rx="12" fill="white" stroke="#d9e2e8"/>
+<text x="56" y="130" class="body bold">Existing RoomTour sections stay in place</text>
+<text x="56" y="155" class="small muted">Demo user · CSV stays / booking history · ZIP search · Local hotel cards · Synchronized Leaflet map</text>
+<text x="32" y="205" class="body bold">Five alternate states of the planned Hotel questions panel</text>
+<text x="32" y="230" class="small muted">Static mockup before implementation. All hotel names and answers below are illustrative fixtures.</text>
+
+<rect x="32" y="250" width="1136" height="248" rx="14" fill="white" stroke="#d9e2e8"/>
+<text x="56" y="284" class="heading">01 · Normal / input state</text>
+<text x="56" y="309" class="small muted">Ready · Ask about locally saved hotel data.</text>
+<text x="56" y="337" class="small bold">Hotel question</text>
+<rect x="56" y="349" width="922" height="46" rx="8" fill="white" stroke="#8093a1"/>
+<text x="72" y="378" class="body">e.g. Which saved hotels in ZIP 16802 have rooms on October 10?</text>
+<rect x="994" y="349" width="150" height="46" rx="8" fill="#184e77" stroke="#184e77"/>
+<text x="1047" y="378" class="body white bold">Send</text>
+<rect x="56" y="413" width="1088" height="57" rx="10" fill="#f7f9fb" stroke="#bccbd6"/>
+<text x="72" y="438" class="small bold">Conversation / answer area</text>
+<text x="72" y="460" class="small muted">Answers use local records. Demo rates and room counts are fictional; this assistant cannot book stays.</text>
+<rect x="32" y="518" width="1136" height="264" rx="14" fill="white" stroke="#d9e2e8"/>
+<text x="56" y="552" class="heading">02 · Loading state</text>
+<text x="56" y="577" class="small muted">Searching local data · Send is disabled while a request is pending.</text>
+<text x="56" y="605" class="small bold">Hotel question</text>
+<rect x="56" y="617" width="922" height="46" rx="8" fill="#f7f9fb" stroke="#8093a1"/>
+<text x="72" y="646" class="body muted">Which saved hotels in ZIP 16802 have rooms on October 10, 2026?</text>
+<rect x="994" y="617" width="150" height="46" rx="8" fill="#8295a5" stroke="#8295a5"/>
+<text x="1019" y="646" class="body white bold">Sending…</text>
+<rect x="56" y="681" width="1088" height="73" rx="10" fill="#edf4f8" stroke="#d9e2e8"/>
+<text x="72" y="706" class="small bold">You: Which saved hotels in ZIP 16802 have rooms on October 10, 2026?</text>
+<circle cx="83" cy="733" r="7" fill="#184e77"/>
+<text x="102" y="738" class="body">Checking local hotel records and preparing an answer…</text>
+<rect x="32" y="802" width="1136" height="342" rx="14" fill="white" stroke="#d9e2e8"/>
+<text x="56" y="836" class="heading">03 · Grounded answer state</text>
+<text x="56" y="861" class="small muted">Answer based on retrieved local rows · Example fixture only.</text>
+<text x="56" y="889" class="small bold">Hotel question</text>
+<rect x="56" y="901" width="922" height="46" rx="8" fill="white" stroke="#8093a1"/>
+<text x="72" y="930" class="body">Which saved hotels in ZIP 16802 have rooms on October 10, 2026?</text>
+<rect x="994" y="901" width="150" height="46" rx="8" fill="#184e77" stroke="#184e77"/>
+<text x="1047" y="930" class="body white bold">Send</text>
+<rect x="56" y="965" width="1088" height="151" rx="10" fill="#eef8f1" stroke="#b6d9c1"/>
+<text x="72" y="989" class="small bold">You: Which saved hotels in ZIP 16802 have rooms on October 10, 2026?</text>
+<text x="72" y="1020" class="body">Assistant: The retrieved rows contain one matching saved hotel: Example Inn.</text>
+<text x="72" y="1045" class="body">For October 10, 2026, its stored demo rate is $100.00/night with 20 rooms available.</text>
+<text x="72" y="1071" class="small bold">Simulated classroom data — not a live price, real availability or booking guarantee.</text>
+<text x="72" y="1097" class="small muted">Basis: 1 illustrative matching row · ZIP 16802 · 2026-10-10 · Saved hotels only; area coverage is incomplete.</text>
+<rect x="32" y="1164" width="1136" height="322" rx="14" fill="white" stroke="#d9e2e8"/>
+<text x="56" y="1198" class="heading">04 · No-match / insufficient-data state</text>
+<text x="56" y="1223" class="small muted">Insufficient local data · An empty result is not a service error.</text>
+<text x="56" y="1251" class="small bold">Hotel question</text>
+<rect x="56" y="1263" width="922" height="46" rx="8" fill="white" stroke="#8093a1"/>
+<text x="72" y="1292" class="body">What rooms are available in ZIP 16802 on November 1, 2026?</text>
+<rect x="994" y="1263" width="150" height="46" rx="8" fill="#184e77" stroke="#184e77"/>
+<text x="1047" y="1292" class="body white bold">Send</text>
+<rect x="56" y="1327" width="1088" height="130" rx="10" fill="#fff8eb" stroke="#dac294"/>
+<text x="72" y="1354" class="small bold">You: What rooms are available in ZIP 16802 on November 1, 2026?</text>
+<text x="72" y="1383" class="body">Assistant: No matching saved nightly rows were found for that date.</text>
+<text x="72" y="1408" class="body">I cannot confirm prices or room counts. Try a date covered by your saved records.</text>
+<text x="72" y="1435" class="small muted">No matching rows does not mean no hotels or rooms exist. Missing fields must also be described as unknown.</text>
+<rect x="32" y="1506" width="1136" height="280" rx="14" fill="white" stroke="#d9e2e8"/>
+<text x="56" y="1540" class="heading">05 · Error state</text>
+<text x="56" y="1565" class="small muted">Request failed · Keep the question and allow a later retry.</text>
+<text x="56" y="1593" class="small bold">Hotel question</text>
+<rect x="56" y="1605" width="922" height="46" rx="8" fill="white" stroke="#8093a1"/>
+<text x="72" y="1634" class="body">Which saved hotels in ZIP 16802 have rooms on October 10, 2026?</text>
+<rect x="994" y="1605" width="150" height="46" rx="8" fill="#184e77" stroke="#184e77"/>
+<text x="1047" y="1634" class="body white bold">Send</text>
+<rect x="56" y="1669" width="1088" height="88" rx="10" fill="#fff0ee" stroke="#d5a3a0"/>
+<text x="72" y="1697" class="body bold">The hotel assistant is temporarily unavailable. Your question is still here; please retry later.</text>
+<text x="72" y="1721" class="small muted">No answer or hotel-data change is implied by this error.</text>
+<text x="72" y="1744" class="small muted">Blocked-query variant: “I could not safely process that question. Please rephrase it as a hotel-data question.”</text>
+<text x="32" y="1821" class="body bold">Design notes</text>
+<text x="32" y="1847" class="small muted">Use labelled fields, native buttons, visible focus, status/alert announcements, and wrapping controls on narrow screens.</text>
+<text x="32" y="1869" class="small muted">Backend validates read-only SQL; only backend code retrieves SQLite rows. The LLM never accesses SQLite directly.</text>
+<text x="32" y="1891" class="small muted">Provider: free Nemotron via OpenRouter; class configuration and current limits will be rechecked. No model ID fixed here.</text>
+</svg>
