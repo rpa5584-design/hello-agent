@@ -26,7 +26,7 @@ def test_first_initialization_preserves_all_csv_values(tmp_path: Path) -> None:
 
     assert counts(database_path) == EXPECTED_COUNTS
     with connect_database(database_path) as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 1
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
         for table in EXPECTED_COUNTS:
             with (DATA_DIR / f"{table}.csv").open(encoding="utf-8-sig", newline="") as source:
                 reader = csv.DictReader(source)

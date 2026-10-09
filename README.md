@@ -36,9 +36,15 @@ First initialization creates backend/data/roomtour.sqlite3 and seeds all four CS
 
 Later starts reuse the initialized database without reloading or duplicating starter rows, even when a table is empty. Creation, cancellation, and deletion persist after browser refresh and service restart. The database and journals are ignored by Git; CSVs are never rewritten.
 
+Assignment 2 Part 2 schema initialization migrates existing version-1 databases to version 2 transactionally, adding empty `saved_hotels` and `demo_hotel_nights` tables. Version 3 then adds `saved_hotel_zips` to store each searched ZIP/location association; version-2 databases migrate directly to version 3. Fresh databases receive the same schema. Repeated startup does not reseed or alter existing records. No additional setup or dependencies are required.
+
+Saved API hotels map `place_id` verbatim to `hotel_id`, `name` to nullable `name`, `formatted_address` to nullable `address`, and `latitude`/`longitude` to required, range-checked coordinates. The provider ID is the primary key. Daily records use `(hotel_id, stay_date)` as their primary key and reference `saved_hotels`; dates must be valid `YYYY-MM-DD` dates. Nonnegative integer defaults of `nightly_rate_cents=10000` ($100.00) and `rooms_available=20` are fictional classroom values, not hotel API data. Saving and removal are available beside ZIP-search hotel results. Saving creates five demo nights for October 10–14, 2026 without overwriting existing nightly values. Removing deletes the hotel, all its ZIP associations, and its demo nights transactionally; instructor records remain separate.
+
 Existing uninitialized or unsupported databases cause startup to fail rather than silently reseed. Failed first imports roll back tables and rows but leave an uninitialized file. Inspect and back up an existing database before explicit manual recovery. Never delete/reset the database during normal launch or verification.
 
 Part 1 hotel search still reads hotels.csv and trips.csv directly, joins by hotel_id, and returns one row per listed stay. Matching is case-insensitive and partial, trimming surrounding whitespace. Harbor returns T001 and T009; no matches return an empty stays array. These are listed stays, not live inventory.
+
+ZIP searches now request local saved hotels first. A successful empty local lookup falls back to the unchanged Part 1 provider endpoint; storage failures show an error and never fall back. Local results are labelled Saved locally and describe a saved subset, not complete area inventory. API results are labelled separately. Saved status is reloaded from SQLite by provider ID on each search, including searches after page refresh. New API hotels are not automatically saved.
 
 ## API and structure
 
@@ -47,6 +53,10 @@ Part 1 hotel search still reads hotels.csv and trips.csv directly, joins by hote
 | GET /api/health | Application health and safe Geoapify configuration status |
 | GET /api/demo/zip-location?zip_code=... | Resolve a five-digit U.S. ZIP; defaults to 16802 when omitted |
 | GET /api/demo/hotels?zip_code=... | Resolve the ZIP and return provider hotels within 5 km |
+| GET /api/local/hotels?zip_code=... | Saved hotels associated with the searched ZIP, stored location and dated demo nights |
+| GET /api/local/hotels/ids | All saved provider IDs for database-backed button status |
+| POST /api/local/hotels | Save hotel and searched ZIP/location; repeated saves preserve existing records |
+| DELETE /api/local/hotels?hotel_id=... | Remove saved hotel, ZIP associations and demo nights together |
 | GET /api/stays?hotel_name=... | Existing hotel search |
 | GET /api/users | Demo users |
 | POST /api/bookings | Create confirmed booking from user_id and trip_id; 201 |

@@ -271,3 +271,36 @@ The failure after calculator cleanup was an outdated health-test assertion, not 
 | Run `npm run build` | Production build succeeds | Vite production build succeeded. | PASS | Ignored build output regenerated. |
 
 Changed only backend/tests/test_database.py and this verification record. No application code, booking/database behavior, frontend source, or dependency changes. No commit or push.
+
+
+## Assignment 2 Part 2 local storage — October 7, 2026
+
+All mutation tests used isolated temporary databases. The separate browser verification used ports 8001/5174 and a synthetic provider response for `temporary-provider-hotel`; it did not save test data to the working database or call live Geoapify. No dependency changes were made.
+
+| Action | Expected | Observed | Result | Notes |
+| --- | --- | --- | --- | --- |
+| Run full backend tests | Original search/booking behavior and new local CRUD/migrations pass | 170 passed; one existing Starlette/httpx deprecation warning | PASS | Includes version-1/version-2/fresh migrations, exact IDs, repeat saves preserving edited nightly values, all five dates/defaults, multi-ZIP association, deletion isolation and transaction rollback. |
+| Run full frontend tests | Frozen map/selection/search tests and new local-first/action/rendering tests pass | 55 passed | PASS | Covers error-versus-empty fallback, database-backed status, pending guards, failures/retries, local subset labels and dated simulated values. |
+| Search 16802 in isolated browser, then Add to Local | Unsaved API card saves only after success | API results appeared; success feedback appeared; Add disabled and Remove became available | PASS | Synthetic provider response, real local HTTP endpoints and temporary SQLite database. |
+| Refresh isolated browser and search again | Saved hotel, context and demo nights reload from database | Saved locally label, stored Verification location, disabled Add, Remove, and October 10–14 dates with $100.00/night and 20 rooms appeared | PASS | Actual browser refresh observed. |
+| Stop/restart isolated backend, refresh and search | Saved values survive backend process restart | Same hotel/context and five nightly rows remained visible | PASS | Actual process restart observed. |
+| Select saved hotel in isolated browser | Accessible card selection still updates matching map marker | Selected indicator appeared and matching marker popup opened | PASS | Actual list-to-map interaction observed. Existing mocked map-to-list coverage passed. |
+| Remove temporary hotel | Card and marker clear after successful removal | Removal success appeared; no local hotel markers/cards remained | PASS | Mutation used only temporary database. |
+| Restart isolated backend, refresh and search after removal | Removed saved records stay absent; successful empty lookup falls back | API results appeared with Add enabled, no Remove and no demo-night display | PASS | Actual browser refresh and backend restart observed. |
+| Compare working database tables across project restart | All existing schemas and records remain unchanged | Per-table schema/record SHA-256 hashes matched; original counts remained 8 hotels, 12 trips, 6 users, 7 bookings; local tables empty | PASS | No disposable test rows entered the working database. |
+| Restart project services and check frontend/proxied health/local lookup/Harbor search | Services run and original search remains intact | Frontend HTTP 200; health ok/key configured; local lookup returned empty array; Harbor returned T001 and T009 | PASS | Only confirmed RoomTour processes were stopped. Temporary verification services were cleaned up. |
+
+Initial checks caught a Vue text-encoding error and an accidental test-status assertion edit. Both were corrected; subsequent checks passed. Live-provider Add/Remove interaction, new-control keyboard interaction and narrow/wide layouts await user manual verification. Browser evidence above uses synthetic provider data, not a live Geoapify result.
+
+
+## Local-storage checkpoint regression — October 8, 2026
+
+| Action | Expected | Observed | Result | Notes |
+| --- | --- | --- | --- | --- |
+| Run backend suite with bytecode and pytest cache disabled | All regression and isolated local-storage mutation tests pass | 170 passed, 0 failed | PASS | One existing Starlette/httpx deprecation warning. |
+| Run frontend suite | All current search, booking, map, selection and local-storage tests pass | 55 passed, 0 failed | PASS | No live provider requests. |
+| Run Oxlint and ESLint without fix/cache flags | Both linters pass without modifying source | Both exited 0 | PASS | No dependency changes. |
+| Run production build | Vue/Leaflet/local-storage interface builds | Vite build succeeded; 36 modules transformed | PASS | Only ignored build output regenerated. |
+| Review changed files and run Git whitespace checks | Checkpoint contains only local-storage source, tests and documentation | Changes reviewed; whitespace check passed | PASS | SQLite, credentials and dependency directories remain ignored. |
+
+Manual-verification status is unchanged: live-provider Add/Remove interaction, keyboard operation of the new controls, and narrow/wide layouts remain pending. October 7 temporary-database browser refresh/restart evidence remains valid for the observed synthetic-data workflow. No chatbot/RAG features added. Running services were not restarted during this checkpoint verification.

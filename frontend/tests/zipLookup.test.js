@@ -114,7 +114,7 @@ test('list uses honest missing-name label and excludes commercial fields and boo
   const html = await renderPanel(state)
   assert.match(html, /Name unavailable/)
   assert.doesNotMatch(html, /123|rating|\bavailable\b|confirmed|Book stay/i)
-  assert.equal((html.match(/<button/g) || []).length, 2)
+  assert.equal((html.match(/<button/g) || []).length, 3)
   assert.match(html, /<form[^>]*novalidate/)
   assert.match(html, /for="demo-zip"/)
   assert.match(html, /type="submit"/)
@@ -178,3 +178,28 @@ for (const outcome of ['success', 'empty', 'error', 'invalid']) {
     assert.equal(state.selectedPlaceId.value, null)
   })
 }
+
+
+test('local cards show dated simulated nights, accurate controls and subset disclosure', async () => {
+  const state = useZipLookup(async () => ({ ...sample('16802', [{
+    place_id: 'local-one', name: 'Saved hotel', saved: true,
+    nights: [{ stay_date: '2026-10-10', nightly_rate_cents: 10000, rooms_available: 20 }],
+  }]), source: 'local' }))
+  await state.lookup()
+  const html = await renderPanel(state)
+  for (const text of ['Saved locally', 'not a complete list', 'Simulated classroom data', '2026-10-10', '$100.00', '20 rooms available', 'Remove from Local']) assert.ok(html.includes(text))
+  assert.match(html, /<button[^>]*disabled[^>]*aria-label="Add Saved hotel to Local"/)
+  assert.match(html, /aria-pressed="false"/)
+  state.pendingId.value = 'local-one'
+  assert.match(await renderPanel(state), /Saving local hotel changes/)
+})
+
+test('unsaved cards expose Add but no Remove and no simulated rates', async () => {
+  const state = useZipLookup(async () => sample())
+  state.zipCode.value = '02108'
+  await state.lookup()
+  const html = await renderPanel(state)
+  assert.match(html, /API results/)
+  assert.match(html, /Add to Local/)
+  assert.doesNotMatch(html, /Remove from Local|Simulated classroom data/)
+})

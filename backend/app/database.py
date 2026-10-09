@@ -39,6 +39,49 @@ SCHEMA = (
     )""",
 )
 
+# API mapping: place_id -> hotel_id, name -> name,
+# formatted_address -> address, latitude/longitude -> latitude/longitude.
+# Provider identity is stored verbatim with SQLite's default binary comparison.
+LOCAL_STORAGE_SCHEMA = (
+    """CREATE TABLE saved_hotels (
+        hotel_id TEXT PRIMARY KEY NOT NULL,
+        name TEXT,
+        address TEXT,
+        latitude REAL NOT NULL CHECK (
+            typeof(latitude) IN ('integer', 'real') AND latitude BETWEEN -90 AND 90
+        ),
+        longitude REAL NOT NULL CHECK (
+            typeof(longitude) IN ('integer', 'real') AND longitude BETWEEN -180 AND 180
+        )
+    )""",
+    """CREATE TABLE demo_hotel_nights (
+        hotel_id TEXT NOT NULL REFERENCES saved_hotels(hotel_id),
+        stay_date TEXT NOT NULL CHECK (
+            stay_date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
+            AND date(stay_date, '+0 days') IS NOT NULL
+            AND date(stay_date, '+0 days') = stay_date
+        ),
+        nightly_rate_cents INTEGER NOT NULL DEFAULT 10000 CHECK (
+            typeof(nightly_rate_cents) = 'integer' AND nightly_rate_cents >= 0
+        ),
+        rooms_available INTEGER NOT NULL DEFAULT 20 CHECK (
+            typeof(rooms_available) = 'integer' AND rooms_available >= 0
+        ),
+        PRIMARY KEY (hotel_id, stay_date)
+    )""",
+)
+
+
+ZIP_ASSOCIATION_SCHEMA = """CREATE TABLE saved_hotel_zips (
+    hotel_id TEXT NOT NULL REFERENCES saved_hotels(hotel_id),
+    zip_code TEXT NOT NULL CHECK (zip_code GLOB '[0-9][0-9][0-9][0-9][0-9]'),
+    latitude REAL NOT NULL CHECK (latitude BETWEEN -90 AND 90),
+    longitude REAL NOT NULL CHECK (longitude BETWEEN -180 AND 180),
+    locality TEXT,
+    country_code TEXT NOT NULL CHECK (country_code = 'us'),
+    PRIMARY KEY (hotel_id, zip_code)
+)"""
+
 
 @contextmanager
 def connect_database(database_path: Path = DATABASE_PATH) -> Iterator[sqlite3.Connection]:
@@ -55,7 +98,7 @@ def connect_database(database_path: Path = DATABASE_PATH) -> Iterator[sqlite3.Co
 def initialize_database(
     database_path: Path = DATABASE_PATH, data_dir: Path = DATA_DIR
 ) -> None:
-    """Seed only a newly created database; never repair/reseed an existing file."""
+    """Seed new databases only, then apply transactional, versioned migrations."""
     try:
         # Exclusive creation prevents treating an existing empty file as a new DB.
         with database_path.open("xb"):
@@ -67,7 +110,17 @@ def initialize_database(
     with connect_database(database_path) as connection:
         connection.execute("BEGIN IMMEDIATE")
         version = connection.execute("PRAGMA user_version").fetchone()[0]
+        if version == 3:
+            return
+        if version == 2:
+            connection.execute(ZIP_ASSOCIATION_SCHEMA)
+            connection.execute("PRAGMA user_version = 3")
+            return
         if version == 1:
+            for statement in LOCAL_STORAGE_SCHEMA:
+                connection.execute(statement)
+            connection.execute(ZIP_ASSOCIATION_SCHEMA)
+            connection.execute("PRAGMA user_version = 3")
             return
         if not newly_created:
             raise RuntimeError(
@@ -77,4 +130,7 @@ def initialize_database(
         for statement in SCHEMA:
             connection.execute(statement)
         seed_database(connection, data_dir)
-        connection.execute("PRAGMA user_version = 1")
+        for statement in LOCAL_STORAGE_SCHEMA:
+            connection.execute(statement)
+        connection.execute(ZIP_ASSOCIATION_SCHEMA)
+        connection.execute("PRAGMA user_version = 3")

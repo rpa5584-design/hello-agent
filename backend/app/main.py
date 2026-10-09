@@ -7,6 +7,7 @@ from app.booking_routes import router as booking_router
 from app.config import geoapify_key_is_configured
 from app.database import initialize_database
 from app.demo_routes import router as demo_router
+from app.local_hotel_routes import router as local_hotel_router
 from app.travel_routes import router as travel_router
 
 
@@ -20,6 +21,7 @@ app = FastAPI(title="RoomTour API", lifespan=lifespan)
 app.include_router(travel_router)
 app.include_router(booking_router)
 app.include_router(demo_router)
+app.include_router(local_hotel_router)
 
 
 @app.get("/api/health")
