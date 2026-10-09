@@ -82,6 +82,21 @@ ZIP_ASSOCIATION_SCHEMA = """CREATE TABLE saved_hotel_zips (
     PRIMARY KEY (hotel_id, zip_code)
 )"""
 
+CONVERSATION_SCHEMA = (
+    """CREATE TABLE conversation_history (
+        message_id INTEGER PRIMARY KEY,
+        conversation_id TEXT NOT NULL,
+        timestamp TEXT NOT NULL,
+        role TEXT NOT NULL CHECK (role IN ('user', 'system', 'assistant')),
+        content TEXT NOT NULL,
+        stage TEXT NOT NULL CHECK (stage IN (
+            'user_question', 'proposed_sql', 'executed_sql',
+            'retrieval_result', 'assistant_answer', 'error'
+        ))
+    )""",
+    "CREATE INDEX conversation_history_order ON conversation_history(conversation_id, message_id)",
+)
+
 
 @contextmanager
 def connect_database(database_path: Path = DATABASE_PATH) -> Iterator[sqlite3.Connection]:
@@ -110,17 +125,17 @@ def initialize_database(
     with connect_database(database_path) as connection:
         connection.execute("BEGIN IMMEDIATE")
         version = connection.execute("PRAGMA user_version").fetchone()[0]
-        if version == 3:
+        if version == 4:
             return
-        if version == 2:
-            connection.execute(ZIP_ASSOCIATION_SCHEMA)
-            connection.execute("PRAGMA user_version = 3")
-            return
-        if version == 1:
-            for statement in LOCAL_STORAGE_SCHEMA:
+        if version in (1, 2, 3):
+            if version == 1:
+                for statement in LOCAL_STORAGE_SCHEMA:
+                    connection.execute(statement)
+            if version < 3:
+                connection.execute(ZIP_ASSOCIATION_SCHEMA)
+            for statement in CONVERSATION_SCHEMA:
                 connection.execute(statement)
-            connection.execute(ZIP_ASSOCIATION_SCHEMA)
-            connection.execute("PRAGMA user_version = 3")
+            connection.execute("PRAGMA user_version = 4")
             return
         if not newly_created:
             raise RuntimeError(
@@ -133,4 +148,6 @@ def initialize_database(
         for statement in LOCAL_STORAGE_SCHEMA:
             connection.execute(statement)
         connection.execute(ZIP_ASSOCIATION_SCHEMA)
-        connection.execute("PRAGMA user_version = 3")
+        for statement in CONVERSATION_SCHEMA:
+            connection.execute(statement)
+        connection.execute("PRAGMA user_version = 4")

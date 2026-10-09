@@ -5,6 +5,7 @@ import UserSelector from './components/UserSelector.vue'
 import BookingHistory from './components/BookingHistory.vue'
 import HotelStaysTable from './components/HotelStaysTable.vue'
 import ZipLookupDemo from './components/ZipLookupDemo.vue'
+import BasicChat from './components/BasicChat.vue'
 import { useBookings } from './composables/useBookings.js'
 import { useHotelSearch } from './composables/useHotelSearch.js'
 const { hotelName, stays, loading, error, noResults, search } = useHotelSearch()
@@ -55,6 +56,7 @@ onMounted(loadUsers)
       <ActionFeedback v-if="feedbackArea === 'history'" :pending="pending" :success="success" :error="bookingError" />
     </BookingHistory>
     <ZipLookupDemo />
+    <BasicChat />
   </main>
 </template>
 

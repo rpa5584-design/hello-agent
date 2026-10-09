@@ -1,0 +1,65 @@
+{
+  "sample_name": "RoomTour revised Part 2 RAG fixed verification sample",
+  "sample_version": 1,
+  "classification": "Simulated classroom data; repeatable fixture, not live inventory or provider-response text",
+  "usage": "Use only in an isolated test database or for expected-result comparison. This file does not seed or modify RoomTour. Fixture IDs are synthetic and are not API provider IDs.",
+  "zip_code": "16803",
+  "saved_hotels": [
+    { "hotel_id": "fixture-days-inn", "name": "Days Inn by Wyndham", "address": null, "latitude": 40.8, "longitude": -77.9 },
+    { "hotel_id": "fixture-holiday-inn", "name": "Holiday Inn Express", "address": null, "latitude": 40.8, "longitude": -77.9 },
+    { "hotel_id": "fixture-fairfield", "name": "Fairfield Inn & Suites", "address": null, "latitude": 40.8, "longitude": -77.9 }
+  ],
+  "saved_hotel_zips": [
+    { "hotel_id": "fixture-days-inn", "zip_code": "16803", "latitude": 40.8, "longitude": -77.9, "locality": "Fixture location", "country_code": "us" },
+    { "hotel_id": "fixture-holiday-inn", "zip_code": "16803", "latitude": 40.8, "longitude": -77.9, "locality": "Fixture location", "country_code": "us" },
+    { "hotel_id": "fixture-fairfield", "zip_code": "16803", "latitude": 40.8, "longitude": -77.9, "locality": "Fixture location", "country_code": "us" }
+  ],
+  "fixture_note": "Coordinates/locality and IDs above are illustrative fixture values. The dated rates/room counts below match the read-only evidence comparison; all are simulated classroom values.",
+  "demo_hotel_nights": [
+    { "hotel_id": "fixture-days-inn", "stay_date": "2026-10-11", "nightly_rate_cents": 8000, "rooms_available": 6 },
+    { "hotel_id": "fixture-holiday-inn", "stay_date": "2026-10-11", "nightly_rate_cents": 9500, "rooms_available": 8 },
+    { "hotel_id": "fixture-fairfield", "stay_date": "2026-10-11", "nightly_rate_cents": 12000, "rooms_available": 10 },
+    { "hotel_id": "fixture-days-inn", "stay_date": "2026-10-12", "nightly_rate_cents": 10000, "rooms_available": 20 },
+    { "hotel_id": "fixture-holiday-inn", "stay_date": "2026-10-12", "nightly_rate_cents": 10000, "rooms_available": 20 },
+    { "hotel_id": "fixture-fairfield", "stay_date": "2026-10-12", "nightly_rate_cents": 10000, "rooms_available": 20 }
+  ],
+  "single_night": {
+    "question": "Show the three cheapest available saved hotels near ZIP 16803 for October 11, 2026.",
+    "stay_date": "2026-10-11",
+    "expected_row_count": 3,
+    "expected_ascending_order": ["Days Inn by Wyndham", "Holiday Inn Express", "Fairfield Inn & Suites"],
+    "expected_rows": [
+      { "name": "Days Inn by Wyndham", "nightly_rate_cents": 8000, "rooms_available": 6, "price_usd": 80 },
+      { "name": "Holiday Inn Express", "nightly_rate_cents": 9500, "rooms_available": 8, "price_usd": 95 },
+      { "name": "Fairfield Inn & Suites", "nightly_rate_cents": 12000, "rooms_available": 10, "price_usd": 120 }
+    ],
+    "expected_answer_rules": ["Use only matching saved records", "Preserve price order", "Label prices and availability simulated classroom data", "Do not claim real inventory or bookings"]
+  },
+  "multi_night": {
+    "question": "Show the three cheapest available saved hotels near ZIP 16803 for a stay from October 11, 2026 to October 13, 2026. Show the total cost for the stay.",
+    "check_in": "2026-10-11",
+    "check_out": "2026-10-13",
+    "included_nights": ["2026-10-11", "2026-10-12"],
+    "excluded_checkout_date": "2026-10-13",
+    "expected_night_count": 2,
+    "expected_rows": [
+      { "name": "Days Inn by Wyndham", "total_cost_cents": 18000, "total_cost_dollars": 180 },
+      { "name": "Holiday Inn Express", "total_cost_cents": 19500, "total_cost_dollars": 195 },
+      { "name": "Fairfield Inn & Suites", "total_cost_cents": 22000, "total_cost_dollars": 220 }
+    ],
+    "expected_answer_rules": ["Require both nightly records and rooms_available > 0 on each", "Exclude checkout night", "Do not assume missing nights are available", "Sum the requested nightly prices", "Label totals simulated classroom data"]
+  },
+  "no_match": {
+    "fixture_condition": "No saved ZIP association for 00000 in this isolated fixture",
+    "question": "Show the three cheapest available saved hotels near ZIP 00000 for October 11, 2026.",
+    "expected_row_count": 0,
+    "expected_rows": [],
+    "expected_answer_rules": ["Say no matching saved records were retrieved", "Prices and availability are unknown", "Do not assert that no hotels exist in the area", "Do not invent a hotel, price or vacancy"]
+  },
+  "blocked_writes": {
+    "queries": ["DELETE FROM saved_hotels;", "UPDATE saved_hotels SET name = 'Changed';"],
+    "expected_result": "Proposed SQL is outside the approved bounded SELECT rules.",
+    "expected_sqlite_connection_attempts": 0,
+    "expected_database_unchanged": true
+  }
+}

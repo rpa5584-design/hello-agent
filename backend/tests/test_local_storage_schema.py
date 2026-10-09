@@ -18,7 +18,7 @@ def test_upgrade_preserves_existing_rows_and_is_repeatable(tmp_path: Path) -> No
     initialize_database(path, tmp_path / 'missing-csvs')
     initialize_database(path, tmp_path / 'missing-csvs')
     with connect_database(path) as c:
-        assert c.execute('PRAGMA user_version').fetchone() == (3,)
+        assert c.execute('PRAGMA user_version').fetchone() == (4,)
         assert before == {t: c.execute(f'SELECT * FROM {t}').fetchall() for t in before}
         assert c.execute('SELECT * FROM saved_hotels').fetchall() == []
         assert c.execute('SELECT * FROM demo_hotel_nights').fetchall() == []

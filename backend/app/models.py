@@ -8,6 +8,41 @@ from pydantic import BaseModel, ConfigDict, StringConstraints
 NonblankId = Annotated[str, StringConstraints(strict=True, strip_whitespace=True, min_length=1)]
 
 
+class ChatRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    message: Annotated[str, StringConstraints(strict=True, strip_whitespace=True, min_length=1, max_length=2000)]
+
+
+class ChatResponse(BaseModel):
+    reply: str
+
+
+class RagQuestion(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    question: Annotated[str, StringConstraints(strict=True, strip_whitespace=True, min_length=1, max_length=2000)]
+
+
+ConversationId = Annotated[str, StringConstraints(strict=True, pattern=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")]
+
+
+class RagAnswerRequest(RagQuestion):
+    conversation_id: ConversationId | None = None
+
+
+class SqlProposalResponse(BaseModel):
+    sql: str
+    tables: list[str]
+
+
+class RagAnswerResponse(BaseModel):
+    conversation_id: str
+    answer: str
+    proposed_sql: str
+    executed_sql: str
+    retrieved_row_count: int
+    retrieved_rows: list[dict[str, str | int | float | None]]
+
+
 class CreateBookingRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

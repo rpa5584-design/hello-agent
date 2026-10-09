@@ -2,6 +2,8 @@
 
 Research/design date: October 8, 2026. **Pre-implementation evidence only.** This document and the linked SVG propose a future feature; no chatbot, RAG pipeline, model call, API integration, route, database change or dependency is implemented by this work.
 
+Historical design evidence: the statements below describe decisions before implementation, not the current application's status. The subsequently selected environment model is `nvidia/nemotron-3-super-120b-a12b:free`; the completed pipeline and user-reported manual verification are recorded in [RAG context](rag-context.md), [verification](verification.md), and the [Part 2 report](../report.md).
+
 ## Revised goal and instructor references
 
 Answer natural-language hotel questions using RoomTour's local SQLite hotel data and an LLM. Retrieve relevant structured rows, then explain them in ordinary language with their dates and data limitations. Preserve Assignment 1 records, the frozen Assignment 2 Part 1 provider API and ZIP/list/map selection, and the completed local-storage foundation.

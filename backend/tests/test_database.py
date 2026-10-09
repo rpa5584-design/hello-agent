@@ -26,7 +26,7 @@ def test_first_initialization_preserves_all_csv_values(tmp_path: Path) -> None:
 
     assert counts(database_path) == EXPECTED_COUNTS
     with connect_database(database_path) as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
         for table in EXPECTED_COUNTS:
             with (DATA_DIR / f"{table}.csv").open(encoding="utf-8-sig", newline="") as source:
                 reader = csv.DictReader(source)
@@ -110,12 +110,16 @@ def test_application_startup_preserves_database_changes(tmp_path: Path, monkeypa
     database_path = tmp_path / "roomtour.sqlite3"
     test_key = "test-only-placeholder"
     monkeypatch.setenv("GEOAPIFY_API_KEY", test_key)
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("OPENROUTER_MODEL", raising=False)
     monkeypatch.setattr("app.main.initialize_database", lambda: initialize_database(database_path))
     with TestClient(app) as client:
         response = client.get("/api/health")
         assert response.status_code == 200
         assert response.json() == {
             "status": "ok",
+            "openrouter_configured": False,
+            "openrouter_model_configured": False,
             "geoapify": "key is configured",
         }
         assert test_key not in response.text

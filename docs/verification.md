@@ -1,5 +1,124 @@
 # RoomTour Part 2 verification
 
+## Final Part 2 evidence — completed manual observations
+
+This final summary supersedes earlier checkpoint statements that populated RAG, DB comparison, multi-night results, refresh/restart persistence or live RAG details were still awaiting verification. The final manual UI checks also confirm Enter submission and the 400px layout; Tab navigation also passed. Historical entries below describe their state at that earlier step. Manual browser/DB Explorer observations here were supplied by the user in the final documentation request; Codex did not repeat those browser actions. Codex independently read the supplied persisted traces and six dated records using read-only access while preparing the package, without a provider call or hotel write.
+
+| Action | Expected | Observed | Result | Notes |
+|---|---|---|---|---|
+| Single-night question: cheapest three available saved hotels in ZIP 16803, Oct 11, 2026 | Three ordered prices with simulated label | Days Inn by Wyndham $80; Holiday Inn Express $95; Fairfield Inn & Suites $120 | PASS | User-reported browser evidence; trace messages 16–20 corroborated |
+| Compare with DB Explorer | Matching hotel/rate/availability facts | October 11 cents/rooms: 8000/6, 9500/8, 12000/10 | PASS | User comparison; independently corroborated by read-only DB query |
+| No-match before populated saved data | Zero records and honest no-match | Earlier same-question trace records show row_count 0, rows [], and unknown prices/availability | PASS | Retrieval messages 9 and 14; not a claim that current populated data remain empty |
+| Oct 11 check-in through Oct 13 checkout | Two positive-availability nights, exclude checkout; sum actual prices | Oct 11 + Oct 12 totals: $180 / $195 / $220 | PASS | User observation and trace messages 21–25; Oct 12 has 10000 cents/20 rooms for each hotel |
+| Inspect live RAG details and Reload saved trace | Show proposed/executed SQL, rows/count and saved stages | User reports successful live demonstration; saved traces are independently readable | PASS | Exact SQL and provenance in rag-context.md |
+| Ctrl+R with localStorage ID fix | Retain ID; saved trace remains reloadable | User reports current ID retained after refresh | PASS | Simulated reload tests also pass; only UUID is stored, no automatic message |
+| Backend restart then Reload saved trace | Same SQLite trace persists | User reports persisted history returned after restart | PASS | Actual restart performed in preceding checkpoint; subsequent browser reload reported by user |
+| Validate DELETE FROM saved_hotels; and UPDATE saved_hotels SET name = 'Changed'; | Reject before execution; preserve DB | Exact rejection: Proposed SQL is outside the approved bounded SELECT rules. Connection attempts 0; temporary DB bytes and test row unchanged | PASS | Isolated verification only; no production writes |
+| Provider diagnostic and corrected setup | Safe successful connection | 401 User not found. before replacement key; later basic call HTTP 200, RoomTour chatbot connected. | PASS | Prior observed calls; no new call for this package |
+| Failed-attempt/error trace | Error without fabricated success | Mocked Stage-1/Stage-2, retrieval, validation and trace-storage failures tested | PASS | Do not present mocked failures as newly observed live provider failures |
+| Keyboard submission with Enter | Submit the question using Enter | Enter submitted the question successfully | PASS | Completed manual browser check |
+| Narrow responsive layout at 400px width | Important controls and content remain readable and usable | Question input, Send button, RAG details, conversation ID and Reload saved trace stayed readable and usable; no important content overflowed horizontally | PASS | Completed manual browser check at 400px |
+| Chatbot Tab navigation | Reach the controls using Tab | Tab navigation reached the chatbot controls successfully | PASS | Completed manual browser check |
+
+Evidence conversations: `6507c84e-9344-4fd0-a697-33ae4a98d263` (earlier no-match and successful single-night) and `1883e882-7dd8-43ce-b161-1172897c8240` (two-night total). See [fixed sample](rag-fixed-sample.json), [RAG context](rag-context.md), and [Part 2 report](../report.md). The fixed fixture is simulated data and does not execute or seed the database. Semantic follow-up context remains outside the implemented scope.
+
+Final automatic rerun for this documentation package: 295 backend tests, 68 frontend tests, both non-fixing frontend linters, production build and Git/new-file whitespace checks passed. One existing Starlette/httpx deprecation warning remains. Tests used isolated databases and mocked providers. Report placeholders are FINAL_COMMIT_PENDING and DEMO_VIDEO_LINK_PENDING; final recording/access review remains pending.
+
+The fixed JSON parsed successfully and its single-night dollar conversions, two-night sums and no-match fixture were checked for consistency. Project-root .env is ignored by .gitignore and untracked. A scan of changed/new nonignored text found neither configured credential values nor long credential-looking tokens; credential values were never printed. This text scan does not substitute for reviewing the eventual demo recording. The documentation task changed no application behavior and made no hotel/history writes or provider calls.
+
+## Historical checkpoint log
+
+The remaining dated entries retain prior results, corrections and evidence boundaries. Statements such as “not restarted in this step” or “unverified” refer to their historical checkpoint and are superseded for the specific completed checks in the final summary above. Current UI persists the conversation ID in localStorage; messages/details remain in memory until the user reloads the saved SQLite trace.
+
+## Frontend RAG integration — 2026-10-08
+
+| Input/action | Expected | Observed | Result/limitation |
+|---|---|---|---|
+| Full frontend suite with mocked backend responses | Existing behavior and RAG states pass without provider quota use | 66 passed, including seven RAG API/state/render/submit tests | Pass |
+| Non-fixing Oxlint and ESLint; production build | Clean lint and build | Both linters and build passed | Pass |
+| Mocked successive answers/failure retry | ID reused; no fabricated answer after failure; input remains retryable | Passed; returned failure ID retained for trace reload | Pass |
+| Rendered RAG details and trace | Only selected application fields; messages escaped | Conversation ID, SQL, row count/rows displayed; injected credential/header fields omitted | Pass |
+| Native form submit handler in custom Vue renderer | Submit invokes send and prevents navigation | Passed | Real-browser Tab/Enter checks passed in the final manual summary above |
+| Read-only GET of running backend OpenAPI | Determine manual-review readiness without provider calls | Current process does not expose `/api/rag/answer` or history route | Backend restart needed before live manual browser review; no service restarted in this step |
+
+The first test run found one custom-renderer harness issue: Vue's input directive required `addEventListener` on its test element. The harness was corrected; all 66 tests passed. No backend compatibility change, provider call, database change, dependency change, or frontend automatic request was added. Existing schema accepts conversation_id; ID reuse groups stored traces but does not provide semantic follow-up context to the LLM. UI state is in memory only, and history reload shows the first bounded page (up to 100). Actual browser layouts, keyboard navigation, live answer/error interaction, and saved trace display await manual review after backend restart.
+
+## Conversation-history persistence — 2026-10-08
+
+| Input/action | Expected | Observed | Result/limitation |
+|---|---|---|---|
+| Full backend suite with mocked providers and temporary databases | Existing behavior, migrations, and trace persistence pass | 295 passed; existing Starlette/httpx deprecation warning | Pass |
+| Successful RAG attempt in temporary DB | One conversation contains all five completed stages | user_question → proposed_sql → executed_sql → retrieval_result → assistant_answer; zero/nonzero result records and final answer matched response | Pass |
+| Stage-1/Stage-2 provider, retrieval, validation, missing-prompt, and transient logging failures | Error recorded without fabricated success | Error traces persisted; no assistant_answer after failed attempt; history-unavailable requests stopped safely | Pass; errors cannot be durably recorded if storage itself remains inaccessible |
+| New connection and simulated server restart via repeat initialization | Ordered history survives without reseeding | Identical messages loaded after reopening and initialization with missing CSV directory | Pass; no actual browser refresh or running backend restart in this step |
+| Real database additive migration from v3 to v4 | Only history schema/index added; all existing rows unchanged | Exact before/after comparisons matched for all seven existing tables: hotels 8, trips 12, users 6, bookings 7, saved_hotels 0, saved_hotel_zips 0, demo_hotel_nights 0; history initially empty | Pass |
+| Credential persistence and SQL separation | Secrets redacted; model cannot access history; logger cannot mutate hotels | Raw stored text contained no tested credentials/header values; validator and retrieval authorizer denied history access; logging authorizer denied hotel writes | Pass |
+
+No live provider call was made. Frontend was not changed. Real database history remains empty because demonstration traces were stored only in temporary test databases. Version 4 is additive and repeatable; rollback was tested for migration failure. History API is `GET /api/rag/conversations/{conversation_id}`, ordered by message ID and paginated with `after_message_id`. RAG success/error responses identify their conversation. The running backend was not restarted; manual browser persistence verification awaits frontend integration and later restart.
+
+## Checked retrieval and RAG Stage 2 — 2026-10-08
+
+| Input/action | Expected | Observed | Result/limitation |
+|---|---|---|---|
+| Full backend regression suite, temporary database mutations and mocked model requests | Existing behavior and retrieval/Stage-2 checks pass | 280 passed, including 19 new retrieval/answer tests; existing Starlette/httpx warning | Pass |
+| Read-only safety tests | Writes/unapproved reads blocked; SQL validated before connection; results/time bounded | Passed authorizer, unchanged temporary DB bytes, positive LIMIT cap, deadline, safe failures and credential rejection checks | Pass |
+| Exactly one live in-process `POST /api/rag/answer` using "Show the three cheapest available saved hotels near ZIP 16803 for October 11, 2026." | Both model stages succeed; empty saved data gives honest no-match | HTTP 200; two completed real LLM stages; 0 retrieved rows; safe no-match answer | Pass; no retry |
+| Git/new-file whitespace checks | No whitespace errors | Passed | Pass |
+
+Live proposed SQL:
+
+```sql
+SELECT s.hotel_id, s.name, d.nightly_rate_cents
+FROM saved_hotels s
+JOIN saved_hotel_zips z ON s.hotel_id = z.hotel_id
+JOIN demo_hotel_nights d ON s.hotel_id = d.hotel_id
+WHERE z.zip_code = '16803'
+  AND d.stay_date = '2026-10-11'
+  AND d.rooms_available > 0
+ORDER BY d.nightly_rate_cents ASC, s.hotel_id
+LIMIT 3;
+```
+
+Executed SQL was identical except the trailing semicolon was removed by validation. Retrieved rows were `[]`. Returned answer: "No matching saved local hotel records were retrieved for your question. Prices and room availability are unknown. Any RoomTour nightly rates and availability are simulated classroom data; this saved subset is not a complete list of hotels in the area."
+
+The second model request received the original question, hotel-assistant instructions, and only the empty bounded records. The backend returned its deterministic empty-result answer after the real second request completed; it does not present this fallback as a verbatim model response. Retrieval used the existing database with `mode=ro`, query-only protection, and a deny-by-default authorizer. No database write occurred. Startup initialization was mocked only in the isolated live verification process; the running backend was not restarted. No credentials were exposed. Live nonempty/multi-night grounding and frontend integration remain unverified; nonempty model claims are constrained by context/instructions but not independently fact-checked. No conversation-history storage or frontend changes were added.
+
+## RAG Stage 1 — 2026-10-08
+
+| Input/action | Expected | Observed | Result/limitation |
+|---|---|---|---|
+| Full backend suite with isolated databases and mocked provider responses | Existing behavior and Stage-1 checks pass | 261 passed; existing Starlette/httpx warning | Pass |
+| Focused Stage-1, chat, configuration and prompt tests | Proposals are independently validated without retrieval | 96 passed, including 46 Stage-1 tests | Pass |
+| Git whitespace checks, including new source files | No whitespace errors | Passed | Pass |
+| Exactly one live Stage-1 request: "Show the three cheapest available saved hotels near ZIP 16803 for October 11, 2026." | Focused SELECT accepted without execution | In-process backend endpoint returned HTTP 200; validator accepted three-table joins, explicit ZIP/date, positive rooms, ascending nightly cents and LIMIT 3 | Pass; SQLite connection blocked and startup initialization mocked for this diagnostic process |
+
+Observed live proposal:
+
+```sql
+SELECT h.hotel_id, h.name, n.nightly_rate_cents/100.00 AS price_usd, n.rooms_available
+FROM saved_hotels h
+JOIN saved_hotel_zips z ON h.hotel_id = z.hotel_id
+JOIN demo_hotel_nights n ON h.hotel_id = n.hotel_id
+WHERE z.zip_code = '16803'
+  AND n.stay_date = '2026-10-11'
+  AND n.rooms_available > 0
+ORDER BY n.nightly_rate_cents ASC, h.hotel_id ASC
+LIMIT 3;
+```
+
+No proposed SQL was executed. Stage 1 uses the prompt loaded into application state at startup, does not connect to SQLite, and has no frontend integration or second model call. Validation is intentionally conservative and rejects unsupported forms; passing it does not establish database executability or intent correctness for every question. Execution safety, retrieval, answer grounding, and browser integration remain future work. The running backend was not restarted in this step; the live endpoint check used an isolated in-process backend with the real configured provider.
+
+## Basic chat wiring checkpoint — 2026-10-08
+
+| Input/action | Expected | Observed | Result/limitation |
+|---|---|---|---|
+| Backend suite using isolated databases and mocked chat transport | All tests pass without provider quota usage | 211 passed; one existing Starlette/httpx deprecation warning | Pass |
+| Frontend suite including chat request/state/rendering tests | All tests pass | 59 passed | Pass |
+| Non-fixing Oxlint and ESLint; production build | Clean lint and successful build | Both linters and build passed | Pass |
+| Exactly one live `POST /api/chat` with `Hello. Reply with only: RoomTour chatbot connected.` after backend restart | HTTP 200 with assistant greeting | HTTP 502 from the application | Provider connectivity remains unverified; no retry was made |
+
+Basic chat sends each message independently and has no SQLite retrieval, SQL generation, bookings, or persistent history. Mocked tests cover provider success, HTTP failures, timeout, malformed responses, credential-echo rejection, missing configuration, and invalid input. Frontend checks cover pending duplicate prevention, retry input retention, visible messages, escaped text, and accessible status/error markup. Actual browser interaction, keyboard use, and wide/narrow chat layouts remain pending manual review. No live provider failure cause is inferred from the safe HTTP 502 response.
+
 ## Latest automated evidence
 
 Verification of the completed redesign on branch part2-sqlite-crud, recorded 2026-09-22:
@@ -57,7 +176,7 @@ Check ownership of ports 8000 and 5173 before launch/restart. Reuse appropriate 
 
 Hotel search must return Harbor stays T001/T009, an empty stays array for no matches, and 422 for blank/missing names. Booking APIs must list users, create with 201, read both statuses, retain cancelled records, delete generated test bookings with 204, and reject protected deletion with 403.
 
-Keyboard interaction has **not been manually verified**. Full final-design wide/narrow layouts, table scrolling, browser logs, and real-browser loading/error recovery remain unrecorded. State and rendered-component tests do not substitute for these checks. Attempted automated browser inspection was blocked by automatic approval review reporting a usage limit; no full post-redesign browser smoke-test pass is claimed.
+Keyboard interaction was pending at this historical checkpoint; later manual checks passed, as recorded below and in the final summary. Full final-design wide/narrow layouts, table scrolling, browser logs, and real-browser loading/error recovery remain unrecorded. State and rendered-component tests do not substitute for these checks. Attempted automated browser inspection was blocked by automatic approval review reporting a usage limit; no full post-redesign browser smoke-test pass is claimed.
 
 No functional blocker was found in automated verification. Final review and the combined-app check remain pending. Part 2 delete screenshot evidence is present and linked above.
 
@@ -209,7 +328,7 @@ Live hotel counts and marker counts are observations, not fixed expectations. Ma
 | Action | Expected | Observed | Result | Notes |
 | --- | --- | --- | --- | --- |
 | Run `node --test tests/*.test.js` from frontend | Shared provider identity connects list selection and marker selection; existing behavior remains covered | 51 tests passed, 0 failed. Tests cover selected ID passed to map, marker click emitted to parent, same-name hotels with distinct IDs, marker emphasis/popup, and selection clearing on new, empty, invalid, and failed searches. Existing search and booking tests passed. | PASS | Mocked Leaflet and component rendering; no live provider or tile requests. |
-| Inspect/render list selection controls | Keyboard-accessible controls and a selected indicator beyond color | Native type=button controls render with aria-pressed; selected list item includes a visible Selected label and border styling. | PASS | Native button semantics support Enter/Space; actual browser keyboard interaction remains unverified. |
+| Inspect/render list selection controls | Keyboard-accessible controls and a selected indicator beyond color | Native type=button controls render with aria-pressed; selected list item includes a visible Selected label and border styling. | PASS | Native button semantics support Enter/Space; browser keyboard interaction was pending here and passed in the September 29 manual check below. |
 | Run `node node_modules/oxlint/bin/oxlint .` and `node node_modules/eslint/bin/eslint.js .` | Both non-fixing linters succeed | Both exited 0. | PASS | No auto-fix flags used. |
 | Run `npm run build` | Production bundle builds successfully | Vite production build succeeded. | PASS | No dependency changes. |
 

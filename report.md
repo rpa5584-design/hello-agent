@@ -1,18 +1,18 @@
-# Assignment 2 Part 1 — Live Hotel Search and Map
+﻿# Assignment 2 Part 2 — Local Hotel Storage and Business-aware RAG
 
-## 1. Project Access
+## A. Project Access
 
 - Repository: [RoomTour](https://github.com/rpa5584-design/hello-agent).
-- Assessed commit: [`4250dd3012ba845255e2fd30ecbd6aba99ab92b8`](https://github.com/rpa5584-design/hello-agent/commit/4250dd3012ba845255e2fd30ecbd6aba99ab92b8), “Complete Assignment 2 Part 1 hotel discovery and map”.
-- Current branch: `main`.
+- Branch: `rag_integration`.
+- Assessed commit: **FINAL_COMMIT_PENDING**. I have not committed the current RAG implementation yet.
+- Frontend: [http://127.0.0.1:5173/](http://127.0.0.1:5173/).
+- Backend: [http://127.0.0.1:8000/](http://127.0.0.1:8000/); [API documentation](http://127.0.0.1:8000/docs).
 
-Use the existing backend virtual environment and frontend dependencies. For a fresh checkout, follow [README setup](README.md#setup-and-run): create a Python environment, install `backend/requirements.txt`, and run `npm ci` in `frontend/` with a supported Node version. Keep all four instructor CSVs in `backend/data/`; do not reset the existing SQLite database.
-
-From the repository root, start each service in a separate PowerShell terminal:
+Follow the [README setup instructions](README.md#setup-and-run). Existing dependencies are in `backend/.venv` and `frontend/node_modules`. For a fresh checkout, install the declared requirements and run `npm ci`. Keep all four instructor CSVs and the existing SQLite database. Start separate PowerShell terminals from the repository root:
 
 ```powershell
 cd backend
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+.\.venv\Scripts\python.exe -B -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
 ```powershell
@@ -20,108 +20,86 @@ cd frontend
 npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-Open [RoomTour](http://127.0.0.1:5173/). Vite proxies `/api` to the local FastAPI backend on port 8000.
+I keep local configuration in the ignored project-root `.env`. `GEOAPIFY_API_KEY` enables live ZIP/hotel discovery. `OPENROUTER_API_KEY` stays backend-only, and `OPENROUTER_MODEL` selects `nvidia/nemotron-3-super-120b-a12b:free`. Keys are not included in this report or frontend/VITE variables. Restart the backend after environment changes; existing process variables take precedence. Health reports boolean OpenRouter configuration statuses without showing credentials. The free model's availability can change.
 
-**Configuration:** `GEOAPIFY_API_KEY` is stored in the local project-root `.env`, beside `frontend/` and `backend/`. `.env` is ignored by Git. The key stays backend-only and must not appear in Vue or a `VITE_` variable. No credential value is included in this report. Restart the backend after changing `.env`; process environment values take precedence. `/api/health` returns health and configuration status without exposing the key. OpenStreetMap tiles require no private frontend credential.
+Startup loads `prompts/hotel-assistant.md`, then applies additive SQLite migrations. Version 4 preserves existing data and adds trace storage. Do not reset or reseed the database.
 
-## 2. Research Notes
+## B. Research Notes
 
-The [recorded research](docs/assignment2-part1-research.md) consulted the following sources before implementation:
+I recorded the revised requirements and my design decisions in the [Part 2 research notes](docs/assignment2-part2-research.md). I used the instructor requirements shared during the project. The repository did not include a separate revised course handout or LMS link.
 
-| Source | Useful patterns and risks | Adopted RoomTour decision |
-| --- | --- | --- |
-| [Geoapify Places API](https://apidocs.geoapify.com/docs/places/) | Hotel categories, geographic filters, provider IDs and coordinates; proximity bias alone does not enforce a radius, and optional fields can be absent. | Resolve the exact U.S. ZIP first; request `accommodation.hotel` within `circle:longitude,latitude,5000`; validate coordinates, deduplicate IDs, and disclose the result cap. |
-| Leaflet [API reference](https://leafletjs.com/reference.html) and [Quick Start](https://leafletjs.com/examples/quick-start/) | Markers, popups, click events, bounds fitting and attribution; unsafe popup HTML and hidden attribution are risks. | Fit returned markers, show literal provider text, emphasize selection, and retain attribution. |
-| [Booking.com State College search](https://www.booking.com/city/us/state-college.html) | Explicit location search, counts, repeated hotel entries and a map entry point; prices, ratings and booking calls to action require unsupported data. | Clear ZIP search and concise name/address entries without commercial claims or live-hotel booking controls. |
-| [Expedia State College listings](https://www.expedia.com/State-College-Hotels.d6057571.Travel-Guide-Hotels) | Prominent hotel names/localities and consistent entries; promotions, large image groups and extensive filters distract from this task. | Compact results and selection on the same page. |
-| [Google Maps nearby-search help](https://support.google.com/maps/answer/4610185?co=GENIE.Platform%3DDesktop&hl=en) | Documents nearby categories and pins; relevance-ranked nearby results do not establish a strict distance boundary. | Preserve ZIP context and connect list selection to a clear active marker. |
+I chose the instructor-permitted free Nemotron option through OpenRouter and used the existing httpx dependency for backend requests. SQL retrieval fits the structured hotel data, so I did not need a vector database. I used two model requests, independent SQL checks, read-only database access, bounded results, and clear messages for missing data. Rates and room availability are labeled as simulated classroom data.
 
-Commercial-interface observations came from accessible page content, not completed interactive testing. Their loading, failure and bidirectional-selection behavior was not verified. Google Maps help was supplemental; its interactive page could not be retrieved.
+My sources include the [OpenRouter API reference](https://openrouter.ai/docs/api_reference/overview), [free models](https://openrouter.ai/models?fmt=free), and the SQLite read-only and authorizer documentation linked in the research notes. I did not add a dependency.
 
-The documented tile decision uses OpenStreetMap Standard raster tiles at `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, with visible © OpenStreetMap contributors attribution. The [OpenStreetMap Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) informed normal interactive use, retained caching, and no bulk/offline downloading or prefetching. Geoapify supplies location/place data; OpenStreetMap supplies the basemap. RoomTour retains its white panels, navy controls, and separate local booking workflow.
+## C. Early Mockup
 
-## 3. Early Mockup
+I created and committed the [early chatbot SVG](docs/assignment2-part2-chatbot-mockup.svg) with the research before implementing the chatbot or RAG. It shows five states: input, loading, grounded answer, no-match/insufficient data, and error. It follows RoomTour's navy controls, white panels, labeled input and status messages. The mockup uses sample data to show the design.
 
-[Early SVG mockup](docs/assignment2-part1-mockup.svg).
+## D. Implementation
 
-The project workflow prepared this mockup before hotel/map implementation; the verification record includes the user's successful browser review. It proposed a ZIP search above a hotel list beside a map, with one selected hotel and corresponding marker, visible attribution, and annotated Loading, Invalid ZIP, Unresolved ZIP, No nearby hotels, and API/service failure states. Shared selection was intended to identify the same hotel across both views.
+I kept the local-storage foundation and preserved Part 1 ZIP/API/list/Leaflet synchronization and original booking behavior. Add to Local saves exact provider IDs and separate searched ZIP associations. It creates October 10–14, 2026 demo nights without overwriting existing values or creating duplicates. Remove deletes the saved hotel, ZIP associations and nightly records in one transaction. ZIP lookup checks local storage first and falls back to the API only after a successful empty local response. Local results are labeled as a saved subset. Rates and room counts are simulated classroom data, not provider inventory.
 
-The documented implementation adjustment moved the map above the list, beneath the ZIP search, at the user's request. The implementation retains the shared provider `place_id` selection concept and distinct feedback states. The mockup is a design artifact, not live hotel data or an independently committed timestamp of implementation order.
+I connected hotel questions to `POST /api/rag/answer`. The workflow is:
 
-## 4. Screen-Recorded Demo
+**Question → proposed SQL → backend validation → SQLite rows → second model request → grounded frontend answer.**
 
-[Assignment 2 Part 1 demo video](https://pennstateoffice365-my.sharepoint.com/:v:/g/personal/rpa5584_psu_edu/IQCR_MnqfyZYQ71LzPAv5JbOARApd5hQQeicDePY6u7lFsc?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=rH8XYW)
+The first OpenRouter request receives the startup-loaded hotel-assistant instructions and question. The backend independently checks that the proposal is one supported SELECT over `saved_hotels`, `saved_hotel_zips`, and `demo_hotel_nights`. It rejects writes, administrative operations, multiple statements, unsupported functions/syntax and unrelated tables. LIMIT is required and capped at 20.
 
-The user manually verified this link in a private/incognito browser window; it opened without requiring an access request.
+The retrieval layer checks the query again and opens SQLite in read-only URI mode. Query-only protection and a deny-by-default authorizer provide additional checks. Execution has time and VM-step limits, and results have row, column and payload limits. The model never accesses SQLite directly.
 
-The final recording should show:
+The second model request receives the original question, instructions and only the retrieved records. Answers label the data as simulated classroom data. If no rows are returned, the backend provides an honest no-match answer after the second request completes. Multi-night rules require every requested night, exclude checkout and add the nightly prices. I compared the demonstrated answers with the retrieved rows. I have not checked every possible question or model answer.
 
-- Enter ZIP `10001` or another valid five-digit U.S. ZIP and submit.
-- Show live hotel results, resolved location and the 5 km radius.
-- Show the Leaflet map and visible OpenStreetMap attribution.
-- Select a list hotel and show its matching map popup/selection.
-- Click another marker and show the matching list selection.
-- Use Tab, Enter and Space for hotel selection.
-- Submit invalid ZIP `1234` and show validation feedback.
-- Keep API keys and `.env` contents out of view throughout.
+Conversation-history writes are controlled by the backend and kept separate from model-generated retrieval. Schema version 4 stores message_id, conversation_id, UTC timestamp, role, content and stage. Each completed step is saved separately. Failures save an error without creating a successful assistant answer. `GET /api/rag/conversations/{conversation_id}` returns ordered, bounded trace pages. Credentials and header values are redacted before storage or return.
 
-## 5. Verification Record
+I kept the Vue presentation component, API helpers and composable state logic separate. The chatbot shows answers, loading, errors and retry. Expandable RAG details show the conversation ID, proposed/executed SQL, row count and rows. Reload saved trace loads the stored history. Only the current conversation UUID is kept in localStorage and restored after refresh; restoring it does not send a question. Conversation IDs group traces, but semantic follow-up context is not implemented. Each question needs its full context. Basic `/api/chat` remains available.
 
-Detailed evidence: [docs/verification.md](docs/verification.md). Manual observations below were reported by the user on **September 29, 2026**; mocked checks are identified separately.
+## E. Verification
+
+I tested the chatbot in the browser, compared the results with DB Explorer, and checked the saved traces and dated database rows. The table separates completed checks from the manual checks I still need to finish.
 
 | Action | Expected | Observed | Result | Notes |
-| --- | --- | --- | --- | --- |
-| Live search `16802` | Resolve the requested U.S. ZIP and retrieve nearby hotels within 5 km | State College resolved; radius was 5000 meters in the backend and 5 km in the UI; 21 hotels were observed. | PASS | Manual backend/frontend evidence; provider IDs, coordinates and available location fields were returned without credentials or invented commercial fields. |
-| Live search `02108` | Preserve the leading zero and replace previous results | ZIP remained `02108`, resolved to Boston; 100 hotels and a possible-more-results notice appeared. | PASS | Manual browser observation. |
-| Live search `10001` | Resolve New York and replace prior locations | New York results appeared with a 5 km radius; 100 hotels were observed; Boston/State College results were not retained. | PASS | Manual browser observation. |
-| Inspect map for `16802`, then `10001` | Render current hotels and replace previous markers | State College map rendered, then moved to New York; old markers disappeared; OpenStreetMap attribution remained visible. | PASS | Manual browser observation; list and map used the same successful search results. |
-| Select Hotel Hayden, then click The Townhouse Inn of Chelsea marker | Synchronize selection in both directions | Hayden gained a Selected indicator and matching popup; clicking the Chelsea marker selected its list hotel and replaced the previous selection. | PASS | Manual browser observation; shared identity uses provider `place_id`. |
-| Use Tab, Enter and Space | Select hotels without a mouse | Controls were reachable; Enter and Space selected hotels and updated map selection. | PASS | Manual browser observation. |
-| Submit `1234` | Reject invalid ZIP format | “Enter exactly five digits for a U.S. ZIP code.” appeared. | PASS | Manual observation plus automated validation coverage. |
-| Mock unmatched/non-U.S. postcode and unresolved response | Reject unresolved ZIP without requesting Places | Backend 404 and frontend unresolved feedback checks passed. | PASS | Automated mocks only; no manual unresolved-state claim. |
-| Mock successful empty Places response | Return an empty success, not a service failure | HTTP 200 with empty hotels and distinct no-hotels feedback passed. | PASS | Automated mocks only. |
-| Mock provider/network/malformed-response failures | Safe service errors, not successful-empty feedback | Error mapping and message checks passed; raw sensitive error text was suppressed. | PASS | Automated mocks only. |
-| Mock provider HTTP 429 | Handle quota/rate-limit response safely | Geocoding and Places failure tests covered 429; backend maps it to service error/502, with frontend 502 feedback tested separately. | PASS | No real quota exhaustion; no quota-specific UI claim. |
-| Start another search after success, then mock HTTP 502 | Clear stale hotels/map/markers and show service feedback | Mounted lifecycle test confirmed map removal, marker cleanup and service alert without “No hotels found”. | PASS | Mocked responses and Leaflet; manual location replacement is recorded separately above. |
+|---|---|---|---|---|
+| Ask for three cheapest available saved hotels in ZIP 16803 on October 11, 2026 | Three available records ordered by nightly cost | Days Inn by Wyndham $80; Holiday Inn Express $95; Fairfield Inn & Suites $120 | PASS | Answer matched the rows and labeled the data as simulated |
+| Compare RAG details with DB Explorer | Names/prices and positive rooms match SQLite | October 11: 8000/6, 9500/8, 12000/10 (cents/rooms); matching dollar prices in the trace | PASS | I confirmed the names, prices and room counts |
+| No-match attempt | Zero rows; no invented hotel, rate or vacancy | Earlier attempts returned row_count 0 and an honest no-match answer | PASS | Saved in the same conversation before the populated result |
+| Ask Oct 11 check-in through Oct 13 checkout total | Two nights, exclude Oct 13, require both nightly records | Totals $180/$195/$220; query joins Oct 11 and Oct 12 with positive rooms | PASS | October 12 rates were 10000 cents each |
+| Validate DELETE and UPDATE in isolated check | Reject before SQLite execution; DB unchanged | Both rejected: “Proposed SQL is outside the approved bounded SELECT rules.”; 0 connection attempts; bytes/row unchanged | PASS | Temporary database and mock only; no production write or provider call |
+| Ctrl+R after conversation-ID persistence fix | ID retained; no automatic question | ID remained available and I could reload the saved trace | PASS | Only the conversation UUID is stored locally |
+| Restart backend, then reload saved trace | Existing SQLite history survives | Saved history loaded after the restart | PASS | I confirmed the trace was still available |
+| Expand RAG details / Reload saved trace | Demonstrate question → SQL → retrieval → answer | Details and saved stages matched the outputs | PASS | Conversation IDs are listed below |
+| Provider connection | Safe successful backend request after configuration fix | Initial 401 “User not found.”; replacement key then HTTP 200 and “RoomTour chatbot connected.” | PASS | No credential was displayed; no new call was made for this report |
+| Mock failed provider/retrieval attempts | Persist error; no fabricated successful answer | Tests covered Stage 1/2 failures, retrieval and validation errors, and trace-write failure | PASS | Mocked calls, not a new live failure demonstration |
+| Full backend suite | All tests pass on isolated databases | 295 passed; one existing Starlette/httpx deprecation warning | PASS | No provider quota used |
+| Full frontend suite | All regression/RAG/persistence tests pass | 68 passed | PASS | Mocked backend and browser storage |
+| Non-fixing Oxlint/ESLint; production build; Git whitespace | Clean checks and successful build | All passed | PASS | No auto-fix or dependency changes |
+| Keyboard submission with Enter | Submit the question using Enter | Enter submitted the question successfully | PASS | Completed manual browser check |
+| Narrow responsive layout at 400px width | Important controls and content remain readable and usable | Question input, Send button, RAG details, conversation ID and Reload saved trace stayed readable and usable; no important content overflowed horizontally | PASS | Completed manual browser check at 400px |
+| Chatbot Tab navigation | Reach the controls using Tab | Tab navigation reached the chatbot controls successfully | PASS | Completed manual browser check |
 
-Live counts are observations, not fixed expectations. The automated request contract verifies a circle centered on the resolved ZIP coordinates with **exactly 5000 meters**, and validates that the geocoded result matches the requested U.S. postcode. Existing local hotel search and booking regression tests passed; live places remain separate from SQLite bookings.
+Successful/no-match conversation: `6507c84e-9344-4fd0-a697-33ae4a98d263`. Multi-night conversation: `1883e882-7dd8-43ce-b161-1172897c8240`.
 
-Final assessed-code technical results:
+Evidence: [fixed JSON verification sample](docs/rag-fixed-sample.json), [RAG schema/SQL/context](docs/rag-context.md), [detailed expected-versus-observed log](docs/verification.md). The JSON file is labeled fixture data, not a provider transcript or automatic production seed.
 
-| Check | Result |
-| --- | --- |
-| Full backend suite | 139 passed |
-| Full frontend suite | 47 passed |
-| Oxlint, non-fixing | PASS |
-| ESLint, non-fixing | PASS |
-| Production build | PASS |
-| `git diff --check` | PASS |
+## F. Demo Video
 
-One existing Starlette/httpx deprecation warning remained. These are recorded implementation/pre-commit results, not tests rerun to draft this report. Commands and detailed verification history are in [README](README.md#verification) and the verification record.
+**DEMO_VIDEO_LINK_PENDING**
 
-## 6. Limitations
+I still need to record and attach the final Part 2 demonstration showing saved hotels, the populated question and DB comparison, both model stages through safe RAG details, no-match, two-night total, blocked-write evidence, and refresh/restart trace persistence. I will keep `.env`, credentials and provider headers out of view. The existing Part 1/Assignment 1 recordings do not replace this Part 2 demo. I also need to check that the final video link is accessible.
 
-- Live Geoapify coverage and available fields can vary; results are not an exhaustive hotel inventory.
-- Searches return at most 100 results. The UI discloses when the cap is reached and more results may be available.
-- Geoapify place data does not prove room availability, ratings or prices; live results make no such claims.
-- Assignment 2 Part 2's persistent shortlist is outside this submission and is not complete.
+## G. AI Disclosure and Evidence Log
 
-## 7. AI Disclosure and Evidence Log
+ChatGPT helped me plan the work, interpret the requirements, and review results. Codex helped me inspect, implement, and test the repository, and draft documentation that I reviewed. The application uses Nemotron through OpenRouter (`nvidia/nemotron-3-super-120b-a12b:free`) to propose SQL and generate grounded answers. I did not record the exact ChatGPT and Codex model versions for every step.
 
-Codex assisted with research synthesis, implementation, tests, cleanup and this report draft under the user's staged instructions and review. The user confirmed that GPT-6 Astra Light was visibly shown in the Codex interface during the Assignment 2 work. ChatGPT (GPT-5.6 Sol) helped interpret assignment requirements, plan the staged workflow, review instructor feedback, draft Codex prompts, and review verification results, as confirmed by the user. Examples below are selected session instructions or concise descriptions, not full chat exports.
+| Tool | Prompt or task | Result / my review |
+|---|---|---|
+| ChatGPT | Plan and review the staged Assignment 2 Part 2 requirements | I worked through scoped checkpoints and reviewed the results |
+| Codex | Preserve Part 1; add local hotel save/remove and local-first lookup | Isolated mutation tests and refresh/restart checks |
+| Codex | Prepare research and a five-state early mockup before implementation | Research and mockup completed before RAG work |
+| Codex | Add backend configuration and basic chatbot wiring | Initial 401 “User not found.”; replacement key then successful greeting |
+| Codex + application Nemotron | Stage 1: question and schema → proposed SQL → backend validation | Live proposal accepted; write attempts rejected before connection |
+| Codex + application Nemotron | Stage 2: checked SQLite rows → second model request → grounded answer | Saved single-night, no-match and two-night traces matched the DB comparison |
+| Codex | Persist traces and connect Vue RAG details/history | Mocked provider tests; separate history writes; conversation-ID localStorage fix |
+| Codex | Review the requirements and organize the final evidence | Browser observations, saved traces and DB results recorded without new model calls |
 
-| Tool | Specific model | Use | Example prompt/evidence | Result/change |
-| --- | --- | --- | --- | --- |
-| ChatGPT | GPT-5.6 Sol | Interpret assignment requirements, plan the staged workflow, review instructor feedback, draft Codex prompts, and review verification results | User-confirmed assistance with Assignment 2 planning and review | Helped structure staged Codex instructions and review the reported verification outcomes. |
-| Codex | GPT-6 Astra Light | Research and early mockup | “Research before implementation”; “Create the early mockup”; [research](docs/assignment2-part1-research.md), [SVG](docs/assignment2-part1-mockup.svg) | Documented sources, design risks, list/map concept and state annotations before implementation. |
-| Codex | GPT-6 Astra Light | Backend Geoapify hotels | “Implement the backend portion ... BACKEND ONLY”; [controller](backend/app/controllers/geoapify_controller.py), [tests](backend/tests/test_hotel_discovery.py) | Separate hotel operation, validated ZIP resolution, exact radius, sanitized models and mocked failures. |
-| Codex | GPT-6 Astra Light | Leaflet map | “IMPLEMENT THE MAP ONLY”; [HotelMap](frontend/src/components/HotelMap.vue), [map adapter](frontend/src/components/hotelMapLayer.js) | Same hotel data rendered as markers with OSM attribution and safe popups. |
-| Codex | GPT-6 Astra Light | Selection synchronization | “Use the Geoapify provider place_id as the shared hotel identity”; [ZIP state](frontend/src/composables/useZipLookup.js) | Shared selected ID, list buttons, marker events, visible selected state and reset behavior. |
-| Codex | GPT-6 Astra Light | Verification | “TEST AND VERIFICATION ONLY”; [mounted lifecycle test](frontend/tests/hotelMapLifecycle.test.js), [verification record](docs/verification.md) | Closed success-to-service-error map-cleanup coverage using mocks; regression checks recorded separately from manual evidence. |
-| Codex | GPT-6 Astra Light | Approved repository cleanup | “Remove ONLY the items previously confirmed SAFE TO REMOVE”; [assessed commit](https://github.com/rpa5584-design/hello-agent/commit/4250dd3012ba845255e2fd30ecbd6aba99ab92b8) | Removed unrelated calculator code/routes/tests and starter README; preserved RoomTour behavior and historical evidence. |
-
-**Failed/revised approaches:** Leaflet installation initially failed because `eslint-plugin-oxlint` 1.73.0 required `oxlint ~1.73.0`, while the project had Oxlint 1.74.0. After explicit approval, Oxlint was pinned to 1.73.0 and Leaflet 1.9.4 installed successfully. No `--force` or `--legacy-peer-deps` was used. See the dependency entries in [verification](docs/verification.md).
-
-The full backend cleanup check also exposed an outdated status-only health assertion. A test-only correction adopted the established `status` plus `geoapify` contract with a synthetic key and no credential exposure; the full backend suite then passed.
-
-During the commit workflow, `git diff --cached --check` found an extra blank line at the end of `hotelMapLifecycle.test.js`. The workflow stopped; only that whitespace was corrected and restaged. The check passed before the assessed commit was created and pushed. This event is evidenced by the recorded project session; no test logic was changed.
+Semantic follow-up context is not implemented, so each question needs its full context. The demonstrated answers matched the retrieved data, but arbitrary model answers are not automatically guaranteed to be correct. I still need to add and check the demo URL, and fill in the assessed commit before submission. Credentials are excluded from this report and the evidence files.
