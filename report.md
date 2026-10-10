@@ -4,7 +4,7 @@
 
 - Repository: [RoomTour](https://github.com/rpa5584-design/hello-agent).
 - Branch: `rag_integration`.
-- Assessed commit: **FINAL_COMMIT_PENDING**. I have not committed the current RAG implementation yet.
+- Assessed commit: `9e48220fe6665c99ee21ddf65c0cb2196fa5344a`.
 - Frontend: [http://127.0.0.1:5173/](http://127.0.0.1:5173/).
 - Backend: [http://127.0.0.1:8000/](http://127.0.0.1:8000/); [API documentation](http://127.0.0.1:8000/docs).
 
@@ -56,7 +56,7 @@ I kept the Vue presentation component, API helpers and composable state logic se
 
 ## E. Verification
 
-I tested the chatbot in the browser, compared the results with DB Explorer, and checked the saved traces and dated database rows. The table separates completed checks from the manual checks I still need to finish.
+I tested the chatbot in the browser, compared the results with DB Explorer, and checked the saved traces and dated database rows. The table records the completed checks.
 
 | Action | Expected | Observed | Result | Notes |
 |---|---|---|---|---|
@@ -83,9 +83,9 @@ Evidence: [fixed JSON verification sample](docs/rag-fixed-sample.json), [RAG sch
 
 ## F. Demo Video
 
-**DEMO_VIDEO_LINK_PENDING**
+[Part 2 Demo Video](https://pennstateoffice365-my.sharepoint.com/:v:/g/personal/rpa5584_psu_edu/IQCxDL_-NKnFTYHVbnL7qqHtAeiuo7PZedsHVnhj8l-Ndv8?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&email=sbillah%40psu.edu&e=jJQbZv)
 
-I still need to record and attach the final Part 2 demonstration showing saved hotels, the populated question and DB comparison, both model stages through safe RAG details, no-match, two-night total, blocked-write evidence, and refresh/restart trace persistence. I will keep `.env`, credentials and provider headers out of view. The existing Part 1/Assignment 1 recordings do not replace this Part 2 demo. I also need to check that the final video link is accessible.
+I completed the final Part 2 demonstration showing saved hotels, the populated question and DB comparison, both model stages through safe RAG details, no-match, two-night total, blocked-write evidence, and refresh/restart trace persistence. The recording is linked above. The existing Part 1/Assignment 1 recordings do not replace this Part 2 demo.
 
 ## G. AI Disclosure and Evidence Log
 
@@ -102,4 +102,4 @@ ChatGPT helped me plan the work, interpret the requirements, and review results.
 | Codex | Persist traces and connect Vue RAG details/history | Mocked provider tests; separate history writes; conversation-ID localStorage fix |
 | Codex | Review the requirements and organize the final evidence | Browser observations, saved traces and DB results recorded without new model calls |
 
-Semantic follow-up context is not implemented, so each question needs its full context. The demonstrated answers matched the retrieved data, but arbitrary model answers are not automatically guaranteed to be correct. I still need to add and check the demo URL, and fill in the assessed commit before submission. Credentials are excluded from this report and the evidence files.
+Semantic follow-up context is not implemented, so each question needs its full context. The demonstrated answers matched the retrieved data, but arbitrary model answers are not automatically guaranteed to be correct. Credentials are excluded from this report and the evidence files.
