@@ -8,9 +8,7 @@ For Assignment 3.1, I focused on research and design. This report describes my p
 
 - Repository: [Coursework repository](https://github.com/rpa5584-design/hello-agent).
 - Branch: `assignment3_part1`.
-- Assessed commit: `FINAL_COMMIT_PENDING`.
-
-The supporting links currently point to files within the repository. After the assessed commit is created, I will replace them with accessible GitHub links pointing to that commit.
+- Assessed commit: `ccc6f048d54c3972bc85bf4cebf2143c2d5c8884`.
 
 ## B. Proposed Application
 
@@ -24,7 +22,7 @@ I used the instructor's findings as the main basis for my design. R1 helped me d
 
 D1 and D2 helped me keep each screen simple, with one main action or breathing cue. D3 led me to avoid questionnaires or personal disclosure before starting. D5 informed the optional fewer-options preference. D6 guided my choice of calm, neutral language without diagnosis or pressure.
 
-My [research notes](docs/assignment3/part3.1/research.md) explain these connections and tradeoffs. The instructor's R1–R4 and D1–D6 table is the required research basis. No separate research dataset is required for this assignment.
+My [research notes](https://github.com/rpa5584-design/hello-agent/blob/ccc6f048d54c3972bc85bf4cebf2143c2d5c8884/docs/assignment3/part3.1/research.md) explain these connections and tradeoffs. The instructor's R1–R4 and D1–D6 table is the required research basis. No separate research dataset is required for this assignment.
 
 ## D. Main Experience and Wireframes
 
@@ -32,7 +30,7 @@ I designed the main flow as:
 
 Home → Choose Paced Breathing → Introduction → Start → Inhale 4 seconds → Exhale 6 seconds → repeat six cycles → Finish.
 
-My [design document](docs/assignment3/part3.1/design.md) includes a flow diagram, six low-fidelity wireframes, example interface text, and planned Stop/Leave/Back behavior. Crisis Support stays available on every screen, including error screens. I still need to verify the final support resource and wording.
+My [design document](https://github.com/rpa5584-design/hello-agent/blob/ccc6f048d54c3972bc85bf4cebf2143c2d5c8884/docs/assignment3/part3.1/design.md) includes a flow diagram, six low-fidelity wireframes, example interface text, and planned Stop/Leave/Back behavior. Crisis Support stays available on every screen, including error screens. I still need to verify the final support resource and wording.
 
 ## E. Model Role and Boundaries
 
@@ -46,7 +44,7 @@ I plan to use Vue, FastAPI, and SQLite, with separate modules and a separate dat
 
 A Saved history interaction will let the person review session summaries and saved conversations without making a new model request or restarting the exercise. I have not decided the exact context limits or how long records should be kept.
 
-My [architecture and verification plan](docs/assignment3/part3.1/architecture-and-verification.md) explains the responsibilities, privacy choices, unresolved persistence behavior, and planned Part 3.2 checks. I have not performed any Assignment 3 runtime tests.
+My [architecture and verification plan](https://github.com/rpa5584-design/hello-agent/blob/ccc6f048d54c3972bc85bf4cebf2143c2d5c8884/docs/assignment3/part3.1/architecture-and-verification.md) explains the responsibilities, privacy choices, unresolved persistence behavior, and planned Part 3.2 checks. I have not performed any Assignment 3 runtime tests.
 
 ## G. Personalization and User Control
 
@@ -62,4 +60,4 @@ I also need to verify the crisis-support resource and region before implementati
 
 I used ChatGPT to help me understand the assignment requirements and plan my design. I used Codex to inspect my repository and help organize, draft, review, and correct the design documents. I reviewed the final content and design decisions.
 
-See [AI-USE.md](AI-USE.md). I have prepared the research mapping, flow diagram, six wireframes, model boundaries, proposed data and architecture, and planned verification checks. These documents show how I intend the experience to work and how I plan to implement it later. They do not show a working Assignment 3 application, runtime test results, usability results, or clinical outcomes.
+See [AI-USE.md](https://github.com/rpa5584-design/hello-agent/blob/ccc6f048d54c3972bc85bf4cebf2143c2d5c8884/AI-USE.md). I have prepared the research mapping, flow diagram, six wireframes, model boundaries, proposed data and architecture, and planned verification checks. These documents show how I intend the experience to work and how I plan to implement it later. They do not show a working Assignment 3 application, runtime test results, usability results, or clinical outcomes.
