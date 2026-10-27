@@ -15,6 +15,14 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        roomtour: fileURLToPath(new URL('./index.html', import.meta.url)),
+        assignment3: fileURLToPath(new URL('./assignment3.html', import.meta.url)),
+      },
+    },
+  },
   server: {
     proxy: {
       '/api': 'http://localhost:8000',

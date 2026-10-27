@@ -2,6 +2,30 @@
 
 RoomTour is a local Vue 3, FastAPI, and SQLite application. Assignment 2 Part 1 adds live hotel discovery and a map while preserving the existing hotel-name search and simulated booking CRUD. Select a demo user, search hotels, book a listed stay, read history, cancel while retaining the record, and delete newly generated test bookings. Instructor bookings are protected from deletion.
 
+## Assignment 3.2 run
+
+Branch: `assignment3_part2`. Use the existing backend virtual environment and frontend dependencies. Start each command from the repository root in a separate PowerShell terminal.
+
+Backend:
+
+```powershell
+cd backend
+.\.venv\Scripts\python.exe -m uvicorn app.main:create_assignment3_app --factory --host 127.0.0.1 --port 8000
+```
+
+Frontend:
+
+```powershell
+cd frontend
+npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
+```
+
+Open [Assignment 3 breathing prototype](http://127.0.0.1:5173/assignment3.html). This separate backend factory uses `backend/data/assignment3.sqlite3`; it does not initialize RoomTour data. Check port ownership first and do not stop unrelated services. Choose the appropriate backend for port 8000.
+
+Optional reflection requires backend-only `OPENROUTER_API_KEY` and `OPENROUTER_MODEL=openrouter/free` in the ignored repository-root `.env`. Use your existing key; never put it in frontend code, VITE variables or evidence. Inherited process environment values take precedence. Restart the intended backend after configuration changes. The router selects free models; the recorded successful exchange does not identify a downstream model. No paid fallback is configured. Breathing and bundled Crisis Support remain available without the provider; saved history needs the backend. Startup reuses stored records; do not reset the database or retry counters for verification.
+
+See the [Part 3.2 report](report.md), [implementation decisions](docs/assignment3/part3.2/implementation-decisions.md), [verification](docs/assignment3/part3.2/verification.md) and [evidence log](docs/assignment3/part3.2/evidence-log.md).
+
 ## Assignment 2 Part 1: Live hotel search and map
 
 Enter a five-digit U.S. ZIP code; leading zeros are preserved. The backend resolves the requested U.S. postcode through Geoapify, then retrieves hotels within 5 km of the resolved point. The hotel list and Leaflet map use the same results, with OpenStreetMap tiles and visible attribution. Selecting a hotel in either view selects the same provider place_id in the other; list controls support keyboard selection.
@@ -10,13 +34,13 @@ Live hotels display available provider names and addresses without invented pric
 
 ## Setup and run
 
-Project: `C:\Users\alana\Desktop\RoomTour`. Current branch: `rag_integration`.
+Project: `C:\Users\alana\Desktop\RoomTour`.
 
 Existing dependencies are in backend/.venv and frontend/node_modules. On a fresh checkout, create a Python virtual environment, install backend/requirements.txt, and run npm ci in frontend/. Use a Node version supported by frontend/package.json. The existing local booking functionality uses built-in sqlite3. Live hotel discovery requires the Geoapify configuration below.
 
 For Geoapify configuration, place `.env` in the project root beside `frontend/` and `backend/`, with the `GEOAPIFY_API_KEY` setting. The API key remains backend-only; never put it in frontend code or a `VITE_` variable. OpenStreetMap tiles require no private frontend credential. Restart the backend after changing `.env`. Existing process environment variables take precedence. `/api/health` reports application status and whether the key is configured; it never returns the key or contacts Geoapify.
 
-For the selected instructor-permitted free Nemotron provider through OpenRouter, `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` are required local backend configuration variables for provider integration. Set them in the same ignored project-root `.env`; `OPENROUTER_MODEL` contains the selected provider model ID, with no hard-coded application default. Never put credentials in frontend code or a `VITE_` variable. Restart the backend after changing configuration; existing process environment variables take precedence. `/api/health` reports only boolean `openrouter_configured` and `openrouter_model_configured` statuses, preserving the existing `status` and `geoapify` fields. It never exposes credentials or contacts either provider. Configuration status does not verify model availability or provider access; successful basic and two-stage calls are recorded in the verification evidence; availability can change. Existing hotel and booking features do not require OpenRouter configuration.
+For the RoomTour OpenRouter integration, `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` are required local backend configuration variables for provider integration. Set them in the same ignored project-root `.env`; `OPENROUTER_MODEL` contains the selected provider model ID, with no hard-coded application default. Never put credentials in frontend code or a `VITE_` variable. Restart the backend after changing configuration; existing process environment variables take precedence. `/api/health` reports only boolean `openrouter_configured` and `openrouter_model_configured` statuses, preserving the existing `status` and `geoapify` fields. It never exposes credentials or contacts either provider. Configuration status does not verify model availability or provider access; successful basic and two-stage calls are recorded in the verification evidence; availability can change. Existing hotel and booking features do not require OpenRouter configuration.
 
 Keep hotels.csv, trips.csv, users.csv, and bookings.csv in backend/data/. From the project root, run in separate PowerShell terminals:
 

@@ -1,63 +1,51 @@
-# Assignment 3.1 — Research and Design
+# Assignment 3.2 - Working Skills Prototype
 
 Rayan Alanazi
 
-For Assignment 3.1, I focused on research and design. This report describes my proposed application. I have not built a working Assignment 3 prototype yet.
+## Project access
 
-## A. Project Access
+- Repository: [Coursework repository](https://github.com/rpa5584-design/hello-agent)
+- Branch: `assignment3_part2`
+- Assessed commit: `FINAL_COMMIT_PENDING`
+- Recording: no separate recording is included for this milestone.
 
-- Repository: [Coursework repository](https://github.com/rpa5584-design/hello-agent).
-- Branch: `assignment3_part1`.
-- Assessed commit: `ccc6f048d54c3972bc85bf4cebf2143c2d5c8884`.
+The implementation and evidence are currently local and uncommitted. Repository-relative links below will expose the current documents once the reviewed files are committed and published; no current submission commit is claimed.
 
-## B. Proposed Application
+## Completed experience
 
-My idea is a simple, low-stress mental-health skills coursework prototype starting with Paced Breathing 4–6. The person chooses the skill, reads a short introduction, and starts six cycles of a 4-second inhale and a 6-second exhale. I chose a 60-second exercise for this prototype. This is a design choice, not a claim about clinical effectiveness.
+The Vue/FastAPI/SQLite prototype offers Paced Breathing 4-6: four seconds inhaling and six seconds exhaling for six cycles, with an intended duration of about 60 seconds. The completed manual observation was **60.6 seconds**, status `completed`, session `8301243d-da5b-417c-a230-6bae6702ee6c`. An older 60.8-second observation is separate evidence. Stop ends an exercise; Back and Leave stop an active run before navigating. No run resumes automatically after interruption. Code and automated tests cover those controls; manual Stop and full-completion observations are recorded. Broader manual interruption checks remain outstanding.
 
-I want the person to be able to begin without typing or sharing personal information. They can stop, leave, go back, or open Crisis Support throughout the experience. I will use fictional scenarios only for testing. The prototype does not monitor people, diagnose, or claim to provide therapy.
+Sessions are saved in an independent SQLite database. Saved History shows skill, timestamps, status and measured duration, and opens stored conversations directly beneath the selected session. Reading a saved conversation makes no model request. Session refresh and backend-restart persistence have user-reported manual evidence. Saved-conversation refresh persistence is newly confirmed by the user; saved-conversation persistence after an actual backend restart remains pending.
 
-## C. Research-Based Design Decisions
+## Bounded model contribution and safety
 
-I used the instructor's findings as the main basis for my design. R1 helped me decide to keep the exercise under 90 seconds. R2 and D4 led me to keep Crisis Support visible and independent of the model. R3 and R4 guided my decision to let the person stop, leave, and choose their own direction.
+One successful live fictional reflection was observed on October 27, 2026 through `openrouter/free`, a free OpenRouter router. The downstream free model was not verified. The exercise associated with that exchange was stopped at 5.5 seconds; it was not a completed breathing exercise. The user entered "The breathing instructions were clear and easy to follow." The browser displayed "The user reflected that the breathing instructions were clear and easy to follow."
 
-D1 and D2 helped me keep each screen simple, with one main action or breathing cue. D3 led me to avoid questionnaires or personal disclosure before starting. D5 informed the optional fewer-options preference. D6 guided my choice of calm, neutral language without diagnosis or pressure.
+The model supplies only an optional acknowledgment/summary. Input is limited to 300 characters, the output allowance to 2048 tokens, accepted final text to 1000 characters, and provider/overall waits to 15 seconds. Three explicit attempts are allowed per session with no automatic retry. The model does not control breathing, navigation or safety decisions. The prompt prohibits diagnosis, therapy and crisis assessment; prompted semantic behavior is not guaranteed.
 
-My [research notes](https://github.com/rpa5584-design/hello-agent/blob/ccc6f048d54c3972bc85bf4cebf2143c2d5c8884/docs/assignment3/part3.1/research.md) explain these connections and tradeoffs. The instructor's R1–R4 and D1–D6 table is the required research basis. No separate research dataset is required for this assignment.
+A local deterministic phrase rule runs before provider access or conversation storage. Matched fictional input receives fixed wording pointing to the independently available Crisis Support screen, without a model request or saved matched text. The finite English rule has false positives and false negatives; a non-match does not establish safety. Crisis Support remains available on relevant screens, including failures. The user verified that it opened while the backend was stopped and displayed the bundled support information and external-service limitations.
 
-## D. Main Experience and Wireframes
+This is a coursework prototype using fictional scenarios. It is not therapy or diagnosis, provides no monitoring, and makes no clinical-effectiveness or comprehensive-crisis-detection claim.
 
-I designed the main flow as:
+## Evidence and its limits
 
-Home → Choose Paced Breathing → Introduction → Start → Inhale 4 seconds → Exhale 6 seconds → repeat six cycles → Finish.
+| Evidence type | What it establishes |
+| --- | --- |
+| Automated regression | 378 backend tests and 102 frontend tests passed; Oxlint, ESLint, production build, whitespace, credential and local-link checks passed. One existing backend deprecation warning remains. See verification.md for commands, scope and limitations. |
+| Manual browser | Completed 60.6-second run; earlier separate 60.8-second run; Stop; one live fictional exchange; session refresh/restart; conversation refresh; backend-unavailable error/Retry and independently available Crisis Support |
+| Automated browser interaction | Reopening saved messages inline and an honest empty state after the history-placement fix |
+| SQLite/read-only comparison | Earlier stopped session: browser 7.1 seconds versus SQLite 7.14 seconds; successful reflection's two saved messages matched backend/proxy GET results and browser display; working database checksum unchanged across those GETs |
 
-My [design document](https://github.com/rpa5584-design/hello-agent/blob/ccc6f048d54c3972bc85bf4cebf2143c2d5c8884/docs/assignment3/part3.1/design.md) includes a flow diagram, six low-fidelity wireframes, example interface text, and planned Stop/Leave/Back behavior. Crisis Support stays available on every screen, including error screens. I still need to verify the final support resource and wording.
+Provider failures save an honest error rather than a fabricated assistant answer. The failed free Nemotron attempt, unknown upstream 404 cause, free-router revision and subsequent 200-to-2048-token correction are documented as actual debugging history, not proof of universal reliability.
 
-## E. Model Role and Boundaries
+Remaining limitations: conversation persistence after an actual backend restart; manual active Back/Leave, refresh/background interruption and save-retry checks; broader keyboard, screen-reader and responsive-layout review. Optional fewer-options controls and Clear history/reset remain unimplemented design plans. Assignment 3 Overview Section 8 is available and has been reviewed. It requires one uploaded report.md for this part, the repository URL and commit identifying the submitted version, accessible links to design documents, verification evidence and relevant recordings, brief explanations of what is complete, what the evidence shows and what remains unresolved, maintained AI-use disclosure, and a curated redacted evidence log with at least one failed/revised approach. This report and its supporting links address those documentation requirements; the assessed commit remains FINAL_COMMIT_PENDING until the submitted version is identified. No separate recording is included for this milestone. Report upload and publication of the final commit remain submission steps; no claim of full rubric completion is made.
 
-I designed the application to control the breathing timing, sequence, navigation, and safety access through fixed application logic. The core exercise does not need a model.
+## Supporting documents
 
-For later implementation, I plan to include a conversational model with limited relevant context: the selected skill, `fewer_options`, and limited session or fictional conversation context. It will support a small interaction or summarize limited saved context. The model must not change the breathing sequence, decide whether someone is in crisis, control or hide Crisis Support, diagnose, claim or provide therapy, or invent therapeutic instructions. I have not made any OpenRouter or other model/provider integration calls for this task.
-
-## F. Proposed Data and Architecture
-
-I plan to use Vue, FastAPI, and SQLite, with separate modules and a separate database. Persistent session records will include `session_id`, `selected_skill`, `started_at`, `ended_at`, and completed/stopped `status`. I also plan to save a `fewer_options` preference and limited persistent conversation records when the conversational feature is used.
-
-A Saved history interaction will let the person review session summaries and saved conversations without making a new model request or restarting the exercise. I have not decided the exact context limits or how long records should be kept.
-
-My [architecture and verification plan](https://github.com/rpa5584-design/hello-agent/blob/ccc6f048d54c3972bc85bf4cebf2143c2d5c8884/docs/assignment3/part3.1/architecture-and-verification.md) explains the responsibilities, privacy choices, unresolved persistence behavior, and planned Part 3.2 checks. I have not performed any Assignment 3 runtime tests.
-
-## G. Personalization and User Control
-
-I plan to offer “Show me fewer options” (`fewer_options`) as an optional preference instead of requiring a settings process. Remembering the last chosen skill may be useful, but it must never start an exercise automatically. The person can change or reset their choice and stop or leave at any time. Personalization must not hide navigation or Crisis Support.
-
-## H. Open Questions and Next Steps
-
-I still need to decide on text or animation cues, reduced-motion behavior, minimal preferences, retention and reset behavior, timer interruptions, browser refresh behavior, model context and output limits, and model failure handling.
-
-I also need to verify the crisis-support resource and region before implementation. Before submission, I need to add the assessed commit, update the supporting-document links, and upload this report. Implementation and testing will come in Part 3.2.
-
-## I. AI Use / Evidence
-
-I used ChatGPT to help me understand the assignment requirements and plan my design. I used Codex to inspect my repository and help organize, draft, review, and correct the design documents. I reviewed the final content and design decisions.
-
-See [AI-USE.md](https://github.com/rpa5584-design/hello-agent/blob/ccc6f048d54c3972bc85bf4cebf2143c2d5c8884/AI-USE.md). I have prepared the research mapping, flow diagram, six wireframes, model boundaries, proposed data and architecture, and planned verification checks. These documents show how I intend the experience to work and how I plan to implement it later. They do not show a working Assignment 3 application, runtime test results, usability results, or clinical outcomes.
+- [Implementation decisions and policy limitations](docs/assignment3/part3.2/implementation-decisions.md)
+- [Current verification and remaining checks](docs/assignment3/part3.2/verification.md)
+- [Curated evidence chronology](docs/assignment3/part3.2/evidence-log.md)
+- [AI-use disclosure](AI-USE.md)
+- [Original design and wireframes](docs/assignment3/part3.1/design.md)
+- [Original research mapping](docs/assignment3/part3.1/research.md)
+- [Run instructions](README.md#assignment-32-run)

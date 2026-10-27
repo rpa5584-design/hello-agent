@@ -18,6 +18,13 @@ from app.rag_routes import router as rag_router
 from app.travel_routes import router as travel_router
 
 
+def create_assignment3_app() -> FastAPI:
+    """Separate launch target; never runs RoomTour's lifespan."""
+    from app.assignment3 import create_app
+
+    return create_app()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.hotel_assistant_prompt = load_hotel_assistant_prompt()
