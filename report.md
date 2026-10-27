@@ -6,10 +6,10 @@ Rayan Alanazi
 
 - Repository: [Coursework repository](https://github.com/rpa5584-design/hello-agent)
 - Branch: `assignment3_part2`
-- Assessed commit: `FINAL_COMMIT_PENDING`
+- Assessed application commit: [c96058ab260cd7b1d1f3a7b991ff92d53d0a429d](https://github.com/rpa5584-design/hello-agent/commit/c96058ab260cd7b1d1f3a7b991ff92d53d0a429d)
 - Recording: no separate recording is included for this milestone.
 
-The implementation and evidence are currently local and uncommitted. Repository-relative links below will expose the current documents once the reviewed files are committed and published; no current submission commit is claimed.
+The implementation and supporting evidence are published at the assessed application commit above. All supporting-document links below are pinned to that version. This final report-only update does not change the assessed application version.
 
 ## Completed experience
 
@@ -38,14 +38,14 @@ This is a coursework prototype using fictional scenarios. It is not therapy or d
 
 Provider failures save an honest error rather than a fabricated assistant answer. The failed free Nemotron attempt, unknown upstream 404 cause, free-router revision and subsequent 200-to-2048-token correction are documented as actual debugging history, not proof of universal reliability.
 
-Remaining limitations: conversation persistence after an actual backend restart; manual active Back/Leave, refresh/background interruption and save-retry checks; broader keyboard, screen-reader and responsive-layout review. Optional fewer-options controls and Clear history/reset remain unimplemented design plans. Assignment 3 Overview Section 8 is available and has been reviewed. It requires one uploaded report.md for this part, the repository URL and commit identifying the submitted version, accessible links to design documents, verification evidence and relevant recordings, brief explanations of what is complete, what the evidence shows and what remains unresolved, maintained AI-use disclosure, and a curated redacted evidence log with at least one failed/revised approach. This report and its supporting links address those documentation requirements; the assessed commit remains FINAL_COMMIT_PENDING until the submitted version is identified. No separate recording is included for this milestone. Report upload and publication of the final commit remain submission steps; no claim of full rubric completion is made.
+Remaining limitations: conversation persistence after an actual backend restart; manual active Back/Leave, refresh/background interruption and save-retry checks; broader keyboard, screen-reader and responsive-layout review. Optional fewer-options controls and Clear history/reset remain unimplemented design plans. Assignment 3 Overview Section 8 is available and has been reviewed. It requires one uploaded report.md for this part, the repository URL and commit identifying the submitted version, accessible links to design documents, verification evidence and relevant recordings, brief explanations of what is complete, what the evidence shows and what remains unresolved, maintained AI-use disclosure, and a curated redacted evidence log with at least one failed/revised approach. This report and its supporting links address those documentation requirements; the assessed application commit is identified above. No separate recording is included for this milestone. Report upload remains a submission step; no claim of full rubric completion is made.
 
 ## Supporting documents
 
-- [Implementation decisions and policy limitations](docs/assignment3/part3.2/implementation-decisions.md)
-- [Current verification and remaining checks](docs/assignment3/part3.2/verification.md)
-- [Curated evidence chronology](docs/assignment3/part3.2/evidence-log.md)
-- [AI-use disclosure](AI-USE.md)
-- [Original design and wireframes](docs/assignment3/part3.1/design.md)
-- [Original research mapping](docs/assignment3/part3.1/research.md)
-- [Run instructions](README.md#assignment-32-run)
+- [Implementation decisions and policy limitations](https://github.com/rpa5584-design/hello-agent/blob/c96058ab260cd7b1d1f3a7b991ff92d53d0a429d/docs/assignment3/part3.2/implementation-decisions.md)
+- [Current verification and remaining checks](https://github.com/rpa5584-design/hello-agent/blob/c96058ab260cd7b1d1f3a7b991ff92d53d0a429d/docs/assignment3/part3.2/verification.md)
+- [Curated evidence chronology](https://github.com/rpa5584-design/hello-agent/blob/c96058ab260cd7b1d1f3a7b991ff92d53d0a429d/docs/assignment3/part3.2/evidence-log.md)
+- [AI-use disclosure](https://github.com/rpa5584-design/hello-agent/blob/c96058ab260cd7b1d1f3a7b991ff92d53d0a429d/AI-USE.md)
+- [Original design and wireframes](https://github.com/rpa5584-design/hello-agent/blob/c96058ab260cd7b1d1f3a7b991ff92d53d0a429d/docs/assignment3/part3.1/design.md)
+- [Original research mapping](https://github.com/rpa5584-design/hello-agent/blob/c96058ab260cd7b1d1f3a7b991ff92d53d0a429d/docs/assignment3/part3.1/research.md)
+- [Run instructions](https://github.com/rpa5584-design/hello-agent/blob/c96058ab260cd7b1d1f3a7b991ff92d53d0a429d/README.md)
