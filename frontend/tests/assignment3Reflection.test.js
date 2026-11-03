@@ -115,7 +115,7 @@ test('model error stays beside visible Crisis Support in the actual Assignment 3
   const parentSource = await readFile(new URL('../src/components/assignment3/Assignment3Shell.vue', import.meta.url), 'utf8')
   const compile = (source) => compileScript(parse(source).descriptor, { id: 'model-error', inlineTemplate: true }).content
     .replace(/import \{([^}]+)\} from ['"]vue['"];?/g, (_, names) => `const {${names.replace(/\bas\b/g, ':')}} = Vue;`)
-    .replace(/import (?:\{[^}]+\}|ReflectionPanel) from [^\n]+/g, '')
+    .replace(/^import .*$/gm, '')
     .replace('export default', 'return')
   let calls = 0
   const model = createReflection({ api: { async submit() { calls++ } } })
@@ -123,7 +123,7 @@ test('model error stays beside visible Crisis Support in the actual Assignment 3
   const Panel = new Function('Vue', 'createReflection', compile(panelSource))(Vue, () => model)
   const { createBreathing } = await import('../src/assignment3/breathing.js')
   const run = createBreathing(); run.start(); run.stop()
-  const component = new Function('Vue', 'createBreathing', 'createSessionStore', 'ReflectionPanel', compile(parentSource))(Vue, () => run, () => ({ state: { sessionId: 'saved-session' } }), Panel)
+  const component = new Function('Vue', 'createBreathing', 'createSessionStore', 'ReflectionPanel', 'createProfileStore', compile(parentSource))(Vue, () => run, () => ({ state: { sessionId: 'saved-session' } }), Panel, () => ({ state: { guidanceMode: 'standard' } }))
   const html = await renderToString(Vue.createSSRApp(component))
   assert.ok(html.includes('That reflection response is unavailable.'))
   assert.ok(html.includes('Retry reflection'))

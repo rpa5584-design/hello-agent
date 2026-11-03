@@ -28,7 +28,7 @@ def test_schema_and_repeat_initialization(store):
     client.post('/api/assignment3/sessions', json=initial)
     initialize(path)
     with sqlite3.connect(path) as connection:
-        assert {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")} == {'sessions', 'conversation_messages', 'reflection_requests'}
+        assert {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")} == {'sessions', 'conversation_messages', 'reflection_requests', 'local_profile'}
         assert connection.execute('SELECT count(*) FROM sessions').fetchone()[0] == 1
         assert {row[1] for row in connection.execute('PRAGMA table_info(sessions)')} == {'session_id', 'selected_skill', 'started_at', 'ended_at', 'status', 'measured_duration_seconds', 'fewer_options'}
 

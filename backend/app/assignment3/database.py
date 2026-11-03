@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from pathlib import Path
 import sqlite3
 from collections.abc import Iterator
+from datetime import datetime, timezone
 
 DATABASE_PATH = Path(__file__).resolve().parents[2] / "data" / "assignment3.sqlite3"
 
@@ -23,6 +24,15 @@ def initialize(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with connect(path) as connection:
         connection.execute("BEGIN IMMEDIATE")
+        connection.execute("""CREATE TABLE IF NOT EXISTS local_profile (
+            profile_id INTEGER PRIMARY KEY CHECK(profile_id=1),
+            display_name TEXT NOT NULL DEFAULT '' CHECK(length(display_name)<=60),
+            guidance_mode TEXT NOT NULL DEFAULT 'standard' CHECK(guidance_mode IN ('standard','fewer')),
+            updated_at TEXT NOT NULL
+        )""")
+        connection.execute("""INSERT INTO local_profile(profile_id,display_name,guidance_mode,updated_at)
+            VALUES (1,'','standard',?) ON CONFLICT(profile_id) DO NOTHING""",
+            (datetime.now(timezone.utc).isoformat(),))
         connection.execute("""CREATE TABLE IF NOT EXISTS sessions (
             session_id TEXT PRIMARY KEY NOT NULL,
             selected_skill TEXT NOT NULL CHECK(selected_skill='paced_breathing_4_6'),

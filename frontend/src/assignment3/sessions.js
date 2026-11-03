@@ -48,11 +48,11 @@ export function createSessionStore({ api = sessionApi, storage = browserSessionS
     await busy
     busy = null
   }
-  function observe(run) {
+  function observe(run, { fewerOptions = false } = {}) {
     if (run.status === priorStatus) return
     priorStatus = run.status
     if (run.status === 'active') {
-      current = { start: { session_id: id(), selected_skill: 'paced_breathing_4_6', started_at: now(), fewer_options: false }, created: false }
+      current = { start: { session_id: id(), selected_skill: 'paced_breathing_4_6', started_at: now(), fewer_options: fewerOptions }, created: false }
       records.push(current); state.sessionId = current.start.session_id; journal()
       void drain()
     } else if (current && run.status) {

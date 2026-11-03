@@ -54,6 +54,12 @@ def reserve(path: Path, session_id: str, reflection: str) -> tuple[dict, str | N
         context = {key: session[key] for key in ('selected_skill', 'status', 'measured_duration_seconds', 'fewer_options')}
         context['fewer_options'] = bool(context['fewer_options'])
         context['reflection'] = content
+        context['guidance_mode'] = connection.execute(
+            "SELECT guidance_mode FROM local_profile WHERE profile_id=1"
+        ).fetchone()['guidance_mode']
+        context['recent_sessions'] = [dict(row) for row in connection.execute(
+            """SELECT selected_skill AS skill,status,measured_duration_seconds FROM sessions
+               ORDER BY started_at DESC,session_id LIMIT 3""")]
         # No earlier turns are needed for the single-exchange use case.
         return context, token
 

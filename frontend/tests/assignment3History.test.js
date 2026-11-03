@@ -59,7 +59,8 @@ for (const scenario of ['saved', 'empty', 'error']) {
     const rows = ['selected-session', 'other-session'].map(session_id => ({ session_id, status: 'stopped', started_at: '2026-10-27T14:00:00Z', selected_skill: 'paced_breathing_4_6', measured_duration_seconds: 5.5 }))
     const Shell = await component('../src/components/assignment3/Assignment3Shell.vue', {
       ReflectionPanel: Panel, createBreathing: () => run,
-      createSessionStore: () => ({ state: { history: rows }, recover() {} }),
+      createSessionStore: () => ({ state: { history: rows }, recover() {}, loadHistory() {} }),
+      createProfileStore: () => ({ state: { guidanceMode: 'standard' }, load() {} }),
     })
     const { renderer, root } = host()
     app = renderer.createApp(Shell); app.mount(root)

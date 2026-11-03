@@ -3,14 +3,22 @@ import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { createBreathing } from '../../assignment3/breathing.js'
 import { createSessionStore } from '../../assignment3/sessions.js'
 import ReflectionPanel from './ReflectionPanel.vue'
+import { createProfileStore } from '../../assignment3/profile.js'
+import PreferencesCard from './PreferencesCard.vue'
+import RecentActivity from './RecentActivity.vue'
 
 const heading = ref(null)
 const selectedHistory = ref('')
+const preferences = createProfileStore({ changed: state => { profile.value = state } })
+const profile = ref({ ...preferences.state })
 const sessions = createSessionStore({ changed: (state) => { saved.value = state } })
 const saved = ref({ ...sessions.state })
-const run = createBreathing({ changed: () => { view.value = { ...run.state }; sessions.observe(run.state) } })
+const run = createBreathing({ changed: () => { view.value = { ...run.state }; sessions.observe(run.state, { fewerOptions: profile.value.guidanceMode === 'fewer' }) } })
 const view = ref({ ...run.state })
-watch(() => view.value.screen, () => heading.value?.focus(), { flush: 'post' })
+watch(() => view.value.screen, screen => {
+  heading.value?.focus()
+  if (screen === 'home') void sessions.loadHistory()
+}, { flush: 'post' })
 let timer
 async function action(fn) {
   fn()
@@ -22,7 +30,8 @@ function visibilityChanged() {
 }
 function pageHidden() { run.interrupt() }
 onMounted(() => {
-  void sessions.recover()
+  void preferences.load()
+  void (async () => { await sessions.recover(); await sessions.loadHistory() })()
   timer = setInterval(run.tick, 100)
   document.addEventListener('visibilitychange', visibilityChanged)
   window.addEventListener('pagehide', pageHidden)
@@ -55,8 +64,11 @@ onUnmounted(() => {
         interrupted: 'The exercise was interrupted.', leave: 'You have left the exercise.',
         support: 'Crisis Support', history: 'Saved History',
       }[view.screen] }}</h2>
+      <PreferencesCard v-if="['home', 'intro'].includes(view.screen)" :state="profile" @name="preferences.setName" @mode="preferences.setMode" @save="preferences.save" @reload="preferences.load" />
       <template v-if="view.screen === 'home'">
+        <p v-if="profile.displayName">Welcome, {{ profile.displayName }}.</p>
         <p>About 60 seconds. No typing needed.</p>
+        <RecentActivity :records="saved.history" :loading="saved.loading" :loaded="saved.loaded" :error="saved.historyError" :guidance-mode="profile.guidanceMode" @reload="sessions.loadHistory()" />
         <button type="button" @click="action(() => run.navigate('intro'))">Paced Breathing</button>
         <button type="button" @click="action(() => { run.navigate('history'); sessions.loadHistory() })">Saved History</button>
       </template>
@@ -65,13 +77,20 @@ onUnmounted(() => {
         <p>Exhale for 6 seconds.</p>
         <p>Repeat for 6 cycles. This exercise lasts about 60 seconds.</p>
         <p>You can stop at any time.</p>
+        <p>Your chosen guidance: {{ profile.guidanceMode === 'fewer' ? 'Fewer instructions' : 'Standard guidance' }}. This changes text only, not the 4/6 timing.</p>
+        <details>
+          <summary>Why this walkthrough?</summary>
+          <p>Our course research favors a short single skill, one cue at a time, permission to stop, and support that stays available. These inform the six cycles and optional simpler guidance; they are design choices, not evidence of clinical benefit.</p>
+        </details>
         <button type="button" @click="action(run.start)">Start</button>
       </template>
       <template v-else-if="view.screen === 'exercise'">
+        <p>{{ profile.guidanceMode === 'fewer' ? 'Fewer instructions' : 'Standard guidance' }} · Exercise in progress.</p>
+        <p v-if="profile.guidanceMode !== 'fewer'">Follow the text cues: inhale for 4 seconds, then exhale for 6 seconds.</p>
         <p>Cycle {{ view.cycle }} of 6</p>
         <p class="cue" aria-live="polite" aria-atomic="true">{{ view.phase }}</p>
         <p>{{ view.remaining }} seconds remaining in this cue</p>
-        <p>You can stop at any time.</p>
+        <p v-if="profile.guidanceMode !== 'fewer'">You can stop at any time.</p>
       </template>
       <template v-else-if="['finished', 'stopped', 'interrupted'].includes(view.screen)">
         <p v-if="view.durationMs !== null">Measured exercise duration: {{ (view.durationMs / 1000).toFixed(1) }} seconds.</p>
@@ -125,9 +144,10 @@ onUnmounted(() => {
 main { max-width: 42rem; margin: 2rem auto; padding: 1rem; font-family: Arial, sans-serif; line-height: 1.6; color: #213547; background: #fff; }
 header { border-bottom: 1px solid #ccd5dc; }
 section { padding-block: 1rem; }
-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; border-top: 1px solid #ccd5dc; padding-block: 1rem; }
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; border-top: 1px solid #ccd5dc; padding-block: 1rem; position: sticky; bottom: 0; background: #fff; z-index: 1; }
 button { padding: 0.65rem 1rem; cursor: pointer; font: inherit; }
 a { color: #164b75; }
-button:focus-visible, a:focus-visible, h2:focus-visible { outline: 3px solid #164b75; outline-offset: 4px; }
+button:focus-visible, a:focus-visible, h2:focus-visible, summary:focus-visible { outline: 3px solid #164b75; outline-offset: 4px; }
+summary { cursor: pointer; margin-block: 0.5rem; }
 .cue { font-size: 2rem; font-weight: bold; }
 </style>

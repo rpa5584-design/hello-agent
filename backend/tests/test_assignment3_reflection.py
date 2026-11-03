@@ -44,7 +44,7 @@ def test_schema_valid_reflection_persisted_and_reopened(setup):
     assert calls[0]['max_tokens'] == 2048
     assert len(calls[0]['messages']) == 2
     context = json.loads(calls[0]['messages'][1]['content'])
-    assert set(context) == {'selected_skill', 'status', 'measured_duration_seconds', 'fewer_options', 'reflection'}
+    assert set(context) == {'selected_skill', 'status', 'measured_duration_seconds', 'fewer_options', 'reflection', 'guidance_mode', 'recent_sessions'}
     assert context['measured_duration_seconds'] == 7.14
     assert client.get(url).json() == before
     assert client.get(url + '/conversation').json() == records

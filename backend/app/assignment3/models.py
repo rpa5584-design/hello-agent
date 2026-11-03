@@ -4,6 +4,7 @@ from typing import Literal
 from uuid import UUID
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator, model_validator
 from datetime import datetime
+import unicodedata
 
 
 class SessionStart(BaseModel):
@@ -61,3 +62,20 @@ class ConversationMessage(BaseModel):
     timestamp: AwareDatetime
     role: Literal["user", "assistant", "error"]
     content: str = Field(min_length=1, max_length=1000)
+
+
+class ProfileUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    display_name: str = Field(default="", max_length=60)
+    guidance_mode: Literal["standard", "fewer"] = "standard"
+
+    @field_validator("display_name")
+    @classmethod
+    def fictional_name(cls, value: str) -> str:
+        if any(unicodedata.category(char).startswith("C") for char in value):
+            raise ValueError("Use a short fictional display name without control characters.")
+        return value.strip()
+
+
+class Profile(ProfileUpdate):
+    updated_at: AwareDatetime

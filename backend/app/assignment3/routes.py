@@ -2,8 +2,8 @@
 import sqlite3
 from uuid import UUID
 from fastapi import APIRouter, HTTPException, Query, Request
-from . import controller, conversation_controller, reflection_service
-from .models import Session, SessionStart, SessionEnd, ReflectionRequest, ConversationMessage
+from . import controller, conversation_controller, reflection_service, profile_controller
+from .models import Session, SessionStart, SessionEnd, ReflectionRequest, ConversationMessage, Profile, ProfileUpdate
 from . import reflection_safety
 
 router = APIRouter(prefix="/api/assignment3", tags=["assignment3"])
@@ -23,6 +23,16 @@ def storage(operation, *args):
 @router.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "application": "assignment3"}
+
+
+@router.get("/profile", response_model=Profile)
+def profile(request: Request) -> dict:
+    return storage(profile_controller.get, request.app.state.database_path)
+
+
+@router.patch("/profile", response_model=Profile)
+def update_profile(body: ProfileUpdate, request: Request) -> dict:
+    return storage(profile_controller.update, request.app.state.database_path, body)
 
 
 @router.post("/sessions", response_model=Session)

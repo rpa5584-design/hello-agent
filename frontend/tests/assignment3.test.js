@@ -6,6 +6,7 @@ import { renderToString } from '@vue/server-renderer'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import { createBreathing, PLANNED_MS } from '../src/assignment3/breathing.js'
 import { createSessionStore } from '../src/assignment3/sessions.js'
+import { createProfileStore } from '../src/assignment3/profile.js'
 
 function clock() {
   let time = 0
@@ -75,13 +76,16 @@ test('every rendered screen retains native safety controls and boundaries withou
     .replace(/import \{ createBreathing \} from [^\n]+/, '')
     .replace(/import \{ createSessionStore \} from [^\n]+/, '')
     .replace(/import ReflectionPanel from [^\n]+/, 'const ReflectionPanel = { render: () => null }')
+    .replace(/import \{ createProfileStore \} from [^\n]+/, '')
+    .replace(/import PreferencesCard from [^\n]+/, 'const PreferencesCard = { render: () => null }')
+    .replace(/import RecentActivity from [^\n]+/, 'const RecentActivity = { render: () => null }')
     .replace('export default', 'return')
   assert.ok(!source.includes('fetch('))
   for (const screen of ['home', 'intro', 'exercise', 'finished', 'stopped', 'interrupted', 'leave', 'support', 'history']) {
     const run = createBreathing()
     if (screen === 'exercise') run.start()
     else run.navigate(screen)
-    const component = new Function('Vue', 'createBreathing', 'createSessionStore', code)(Vue, () => run, createSessionStore)
+    const component = new Function('Vue', 'createBreathing', 'createSessionStore', 'createProfileStore', code)(Vue, () => run, createSessionStore, createProfileStore)
     const html = await renderToString(Vue.createSSRApp(component))
     for (const text of ['Coursework skills prototype', 'Not therapy or diagnosis', 'Nobody is monitoring this experience', 'Testing uses fictional scenarios only', '>Back</button>', '>Leave</button>', '>Crisis Support</button>']) assert.ok(html.includes(text), `${screen}: ${text}`)
     if (screen === 'exercise') assert.match(html, />Stop<\/button>/)
@@ -99,7 +103,7 @@ test('every rendered screen retains native safety controls and boundaries withou
   for (const [overrides, expected] of scenarios) {
     const run = createBreathing(); run.navigate('history')
     const mockStore = () => ({ state: { history: [], ...overrides } })
-    const component = new Function('Vue', 'createBreathing', 'createSessionStore', code)(Vue, () => run, mockStore)
+    const component = new Function('Vue', 'createBreathing', 'createSessionStore', 'createProfileStore', code)(Vue, () => run, mockStore, createProfileStore)
     const html = await renderToString(Vue.createSSRApp(component))
     assert.ok(html.includes(expected), expected)
     assert.ok(html.includes('>Crisis Support</button>'))

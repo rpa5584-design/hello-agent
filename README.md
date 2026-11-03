@@ -26,6 +26,12 @@ Optional reflection requires backend-only `OPENROUTER_API_KEY` and `OPENROUTER_M
 
 See the [Part 3.2 report](report.md), [implementation decisions](docs/assignment3/part3.2/implementation-decisions.md), [verification](docs/assignment3/part3.2/verification.md) and [evidence log](docs/assignment3/part3.2/evidence-log.md).
 
+## Assignment 3 presentation extension
+
+On `assignment3_part3`, the integrated presentation baseline uses the same Assignment 3 launch commands above. Home and the introduction offer a fictional local profile and Standard/Fewer guidance. Save preferences explicitly to remember them; unsaved changes apply only on the current page. Recent activity reads real saved sessions. Restart the intended backend to load the new routes and additive `local_profile` table; existing session/conversation rows remain intact. No new dependencies or environment variables are required. The free OpenRouter configuration is unchanged, and profile/history GETs never call a model.
+
+See the [four-minute presentation checklist and verification](docs/assignment3/presentation/demo-checklist.md). The assessed Part 3.2 commit remains `c96058ab260cd7b1d1f3a7b991ff92d53d0a429d`; the integrated presentation baseline adds functionality without rewriting that commit. The assessment report and Part 3.2 evidence remain pinned to the assessed version.
+
 ## Assignment 2 Part 1: Live hotel search and map
 
 Enter a five-digit U.S. ZIP code; leading zeros are preserved. The backend resolves the requested U.S. postcode through Geoapify, then retrieves hotels within 5 km of the resolved point. The hotel list and Leaflet map use the same results, with OpenStreetMap tiles and visible attribution. Selecting a hotel in either view selects the same provider place_id in the other; list controls support keyboard selection.
