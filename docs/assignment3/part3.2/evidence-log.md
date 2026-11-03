@@ -48,7 +48,7 @@ Source: user-supplied final audit/finalization observations; the completion/stat
 | --- | --- | --- | --- |
 | Complete session `8301243d-da5b-417c-a230-6bae6702ee6c` | Six-cycle exercise completes around 60 seconds | 60.6 seconds; status completed | PASS; distinct from the earlier 60.8-second run |
 | Refresh browser and reopen saved conversation | Stored reflection/acknowledgment remain available | User confirms saved-conversation refresh persistence in finalization instructions | PASS; no new timestamp or SQLite comparison was supplied for this refresh |
-| Restart backend then reopen the same conversation | Messages remain available after actual process restart | No recorded manual result establishes this check | PENDING; session restart evidence alone is insufficient |
+| Restart backend then reopen the same conversation | Messages remain available after actual process restart | No recorded manual result establishes this check | Pending at Part 3.2; resolved for the identified conversation by user-observed November 2 check in section 11 below |
 
 The earlier session refresh and backend-restart PASS observations remain valid within their recorded scope. No database duration comparison for the 60.6-second run is inferred.
 
@@ -105,4 +105,17 @@ This appended entry concerns baseline 0f2d7c60b1a293f312a3f2ec7829958bc7c9241b o
 | Whitespace and evaluation structure/local-link checks | No defects, correct counts and existing file targets | Checks passed | PASS locally; new documentation is not published |
 | Plan later model/boundary selection | Three fictional cases with clear expected outcomes | LIVE-1 and LIVE-2 plan real inferences; LIVE-3 requires deterministic bypass and zero provider calls | PENDING execution; no observed live results |
 
-No new manual browser interaction, server restart, working-database inspection/write, provider request or recording was performed. Existing saved-conversation placement evidence is reused as a process-screencast candidate; no original footage or new reconstruction is claimed. Comprehensive screen-reader testing, active interruption checks, conversation persistence after actual server restart and personalized live responses remain unverified within their stated scopes. The evaluation package adds no app redesign or final report, and no commit or push was made. See [Part 3.3 evaluation](../part3.3/evaluation.md) and [verification](../part3.3/verification.md).
+No new manual browser interaction, server restart, working-database inspection/write, provider request or recording was performed. Existing saved-conversation placement evidence is reused as a process-screencast candidate; no original footage or new reconstruction is claimed. At that planning checkpoint, comprehensive screen-reader testing, active interruption checks, conversation persistence after actual server restart and personalized live responses remained unverified within their stated scopes. Section 11 records the later manual results; background/suspension, comprehensive screen-reader behavior and personalized live responses remain pending. The evaluation package adds no app redesign or final report, and no commit or push was made. See [Part 3.3 evaluation](../part3.3/evaluation.md) and [verification](../part3.3/verification.md).
+
+## 11. User-observed Part 3.3 manual verification - November 2, 2026
+
+Source: user-supplied observations, not new Codex browser or database actions.
+
+| Input/action | Expected | User-observed result | Result / boundary |
+| --- | --- | --- | --- |
+| S07 active Back, then refresh | Stop and retain stopped history; no resume; support available | Recent activity: Paced Breathing — stopped — 8.6 seconds; no automatic resume; Crisis Support available | PASS |
+| S07 active Leave, then refresh | Stop and retain stopped history; no resume | Recent activity: Paced Breathing — stopped — 11.7 seconds; no automatic resume | PASS |
+| S08 active browser refresh | Interrupted history, no running exercise/resume; support available | Home: "No exercise is running." Recent activity: Paced Breathing — interrupted — 3.2 seconds; no automatic resume; Crisis Support available | PASS for refresh; background/suspension pending |
+| S12 actually stop/restart Assignment 3 backend, refresh and reopen session a0a9989c-6b90-4b2a-a6c2-2855272d00f3 | Same saved messages in order, no new model request required | Fictional reflection "The breathing instructions were clear and easy to follow." followed by acknowledgment "The user reflected that the breathing instructions were clear and easy to follow." present before and after restart | PASS for the identified saved conversation; resolves earlier restart-persistence pending item |
+
+Exact evidence and limits are also recorded in [Part 3.3 verification](../part3.3/verification.md#latest-user-observed-manual-checks---november-2-2026). Durations are UI observations without new SQLite comparison. No new live inference is implied by reopening the old exchange. Codex made no provider call, application change or database-data change while recording these observations. LIVE-1/LIVE-2/LIVE-3 remain PENDING; no commit or push was made during this update.

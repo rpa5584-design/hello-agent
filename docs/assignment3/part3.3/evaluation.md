@@ -1,8 +1,8 @@
 # Assignment 3.3 evaluation
 
-Baseline: `0f2d7c60b1a293f312a3f2ec7829958bc7c9241b`, branch `assignment3_part3`. Evaluation date: November 2, 2026. This package reuses exact existing fictional tests and attributed historical evidence; no new scenarios were manually enacted, no live provider request was made, and no working SQLite database was modified. [Current verification](verification.md) records the rerun.
+Baseline: `0f2d7c60b1a293f312a3f2ec7829958bc7c9241b`, branch `assignment3_part3`. Evaluation date: November 2, 2026. This package reuses exact existing fictional tests and attributed historical evidence; the initial package enacted no new manual scenarios. The November 2 user-observed checks below supplement that package; Codex made no provider request or working-database change while recording them. [Current verification](verification.md) records the rerun.
 
-PASS below means the stated automated assertions passed, supplemented only where explicitly labelled by historical observations. It does not mean every browser, persistence or live-model variation passed. Manual gaps remain pending even when automated evidence passes. Test references are repository-relative exact file/test names; shared parameterized tests support distinct actions without counting them as new executions.
+PASS below means the stated automated assertions passed, supplemented where explicitly labelled by historical or latest user-observed checks. It does not mean every browser, persistence or live-model variation passed. Manual gaps remain pending even when automated evidence passes. Test references are repository-relative exact file/test names; shared parameterized tests support distinct actions without counting them as new executions.
 
 Historical sources: [presentation checklist](../presentation/demo-checklist.md), [Part 3.2 evidence log](../part3.2/evidence-log.md), [Part 3.2 verification](../part3.2/verification.md). Historical user reports, automated browser control and isolated SQLite checks are distinct evidence sources, not new observations on this date.
 
@@ -73,20 +73,20 @@ Historical sources: [presentation checklist](../presentation/demo-checklist.md),
 - **Fictional user action/input:** Sam starts, then selects Back or Leave at 0 or 4000 ms.
 - **Area being tested:** Navigation; interruption
 - **Expected result:** Run stops before navigation and does not resume automatically.
-- **Evidence method:** automated mocked test.
-- **Observed result:** Home/leave navigation cases passed with stopped status, null phase and correct destination. Manual active Back/Leave observation remains pending; controller tests are not browser clicks.
-- **Status:** PASS within stated evidence scope.
-- **Evidence reference:** frontend/tests/assignment3.test.js: home navigation stops timing at 0 ms / 4000 ms; leave navigation stops timing at 0 ms / 4000 ms.
+- **Evidence method:** automated mocked test; manual browser (user-observed November 2, 2026).
+- **Observed result:** Home/leave navigation cases passed with stopped status, null phase and correct destination. User-observed November 2 checks: Back stopped an active exercise; after refresh Recent activity showed stopped, 8.6 seconds. Leave stopped an active exercise; after refresh Recent activity showed stopped, 11.7 seconds. Neither resumed automatically. Crisis Support remained available during the Back check. See the latest manual table in verification.md.
+- **Status:** PASS for cited automated evidence and the specified user-observed November 2 manual check.
+- **Evidence reference:** verification.md, Latest user-observed manual checks; frontend/tests/assignment3.test.js: home navigation stops timing at 0 ms / 4000 ms; leave navigation stops timing at 0 ms / 4000 ms.
 
 ### 8. S08 - Refresh/interruption does not resume
 
 - **Fictional user action/input:** Sam refreshes an active run, or backgrounds/suspends it.
 - **Area being tested:** Recovery; interruption
 - **Expected result:** Prior active record becomes interrupted when recovered; new screen Home, no resumed cues or catch-up.
-- **Evidence method:** automated mocked test.
-- **Observed result:** Mocked journal recovery and clock interruption tests passed. Actual active-refresh/background browser verification remains pending.
-- **Status:** PASS within stated evidence scope.
-- **Evidence reference:** frontend/tests/assignment3Sessions.test.js: refresh recovers a prior active record as interrupted without resuming; frontend/tests/assignment3.test.js: background interruption and suspension never catch up or resume automatically.
+- **Evidence method:** automated mocked test; manual browser (user-observed November 2, 2026).
+- **Observed result:** Mocked journal recovery and clock interruption tests passed. User-observed November 2 active refresh: no automatic resume; Home displayed "No exercise is running." Recent activity showed interrupted, 3.2 seconds, and Crisis Support remained available. Background/suspension browser checks remain pending. This displayed duration was not independently compared with SQLite.
+- **Status:** PASS for cited automated evidence and the specified user-observed November 2 manual check.
+- **Evidence reference:** verification.md, Latest user-observed manual checks; frontend/tests/assignment3Sessions.test.js: refresh recovers a prior active record as interrupted without resuming; frontend/tests/assignment3.test.js: background interruption and suspension never catch up or resume automatically.
 
 ### 9. S09 - Recent activity uses saved history
 
@@ -123,10 +123,10 @@ Historical sources: [presentation checklist](../presentation/demo-checklist.md),
 - **Fictional user action/input:** Sam opens a saved session conversation; also opens a session without messages.
 - **Area being tested:** Saved conversation; ordinary use
 - **Expected result:** Ordered stored messages appear beside selected session; empty/error states honest; GET only, no model request.
-- **Evidence method:** automated mocked test; manual browser (historical automated browser control); SQLite inspection (historical read-only).
-- **Observed result:** Mounted saved/empty/error cases and forbidden-provider GET tests passed. Earlier browser/data comparison returned matching two records, HTTP 200 and unchanged DB checksum. Actual conversation restart persistence remains pending.
-- **Status:** PASS within stated evidence scope.
-- **Evidence reference:** frontend/tests/assignment3History.test.js: mounted history click shows saved / empty / error state beside its session using only GET; backend/tests/test_assignment3_reflection.py::test_history_get_is_read_only_and_never_calls_provider; Part 3.2 evidence log section 7.
+- **Evidence method:** automated mocked test; manual browser (historical automated browser control and user-observed November 2, 2026); SQLite inspection (historical read-only).
+- **Observed result:** Mounted saved/empty/error cases and forbidden-provider GET tests passed. Earlier browser/data comparison returned matching two records, HTTP 200 and unchanged DB checksum. User observed on November 2 that session a0a9989c-6b90-4b2a-a6c2-2855272d00f3 retained both original messages in the same order after the Assignment 3 backend was actually stopped/restarted, the browser refreshed and the same session reopened. Opening history required no new model request. Exact messages are recorded in verification.md; no new SQLite comparison is claimed.
+- **Status:** PASS for cited automated evidence and the specified user-observed November 2 manual check.
+- **Evidence reference:** verification.md, Latest user-observed manual checks; frontend/tests/assignment3History.test.js: mounted history click shows saved / empty / error state beside its session using only GET; backend/tests/test_assignment3_reflection.py::test_history_get_is_read_only_and_never_calls_provider; Part 3.2 evidence log section 7.
 
 ### 13. S13 - Deterministic crisis phrase bypass
 
@@ -174,15 +174,15 @@ Historical sources: [presentation checklist](../presentation/demo-checklist.md),
 - **Evidence:** S01/S02/S05–S08; frontend exact clock/mounted mode tests; backend/tests/test_assignment3_profile.py::test_model_text_cannot_change_saved_profile_or_exercise.
 - **Observed result:** Both modes completed at simulated 60000 ms; exact cue boundaries and Stop/navigation/interruption assertions passed. Untrusted model-text fixture changed neither saved profile nor session.
 - **Status:** PASS for automated control/timing checks.
-- **Limitation:** Active Back/Leave, refresh and background behavior still need manual browser verification; model wording can be semantically unsuitable despite being display-only.
+- **Limitation:** Active Back/Leave and active refresh now have user-observed manual PASS evidence. Background/suspension behavior still needs manual browser verification; model wording can be semantically unsuitable despite being display-only.
 
 ### BC3 — Honest persistence and personalization
 
 - **Expectation:** Profile, session and conversation history use persisted facts without inventing history; opening saved history triggers no model request.
 - **Evidence:** S04/S09/S10/S12/S15; backend reopen/context/GET-only tests, mounted empty/error/history tests, historical profile refresh/restart and session persistence observations.
-- **Observed result:** Isolated database reopen/context assertions passed; stored profile and earlier sessions have documented refresh/restart evidence. Saved conversation GETs matched stored records without provider calls; honest empty/error states passed.
+- **Observed result:** Isolated database reopen/context assertions passed; stored profile and earlier sessions have documented refresh/restart evidence. Saved conversation GETs matched stored records without provider calls; honest empty/error states passed. The November 2 user-observed restart check retained the specified session's two messages in order without a new model request.
 - **Status:** PASS for tested storage, display and GET-only behavior.
-- **Limitation:** Saved-conversation persistence after an actual server restart is PENDING. TestClient reopen is not a server-process restart; no end-to-end persistence claim for all entities is made.
+- **Limitation:** The specified saved conversation now has user-observed PASS evidence after an actual backend restart and browser refresh. This establishes that session's two messages only; no new SQLite inspection or universal persistence guarantee is claimed.
 
 ## Evaluation requirement coverage
 
@@ -190,7 +190,7 @@ Historical sources: [presentation checklist](../presentation/demo-checklist.md),
 - **Interruptions:** S06–S08.
 - **Failures/safety boundaries:** S11, S13–S15; S09 also covers empty/error history.
 
-Exactly 15 numbered scenarios and exactly three behavior checks are above. All 15 have passing scoped automated evidence; none is marked as a newly completed manual-only check. New manual work remains: S07 active Back/Leave; S08 real active refresh/background/suspension; S11 healthy-backend provider-failure observation if desired; S15 profile/session save-failure UI. S12 actual conversation persistence after server restart is pending. S04 already has isolated historical refresh/restart evidence; repeat on the demonstration instance if claiming that instance. S10 live personalized wording is pending under the cases below. No clean-checkout run, finished demonstration or process recording is claimed by this package.
+Exactly 15 numbered scenarios and exactly three behavior checks are above. All 15 retain passing scoped automated evidence. S07 active Back/Leave, S08 active refresh and S12 the specified conversation after actual backend restart now also have user-observed November 2 manual PASS evidence. Remaining manual work: S08 background/suspension; optional S11 healthy-backend provider-failure observation; S15 profile/session save-failure UI. S04 has isolated historical profile refresh/restart evidence; repeat on the demonstration instance if claiming that instance. S10 live personalized wording is pending under the cases below. No clean-checkout run, finished demonstration or process recording is claimed by this package.
 
 ## Surprising finding and process-screencast candidate
 
