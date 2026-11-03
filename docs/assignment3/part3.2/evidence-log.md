@@ -92,3 +92,17 @@ Full regression suites passed: **378 backend tests** (26.44 seconds, one existin
 No new test dependency or backend linter was installed. Backend execution used the approved non-sandbox path because TestClient had previously failed inside the sandbox. No provider call or working-database write occurred in this run.
 
 No live provider call, working database modification, configuration change, dependency addition, commit or push occurred in this finalization. Remaining manual evidence and limitations are listed in verification.md. No separate recording is included for this milestone. Correction before commit: Assignment 3 Overview Section 8 is available and has been reviewed. Its requirements are one uploaded report.md for the part; repository URL and submitted-version commit; accessible design, verification and relevant-recording links; brief completion/evidence/unresolved explanations; maintained AI-use disclosure; and a curated redacted log with at least one failed/revised approach. The report and linked documents reflect these requirements. FINAL_COMMIT_PENDING remains unchanged, no recording is invented, and final commit publication/report upload remain outstanding.
+
+## 10. Part 3.3 evaluation planning and mocked rerun - November 2, 2026
+
+This appended entry concerns baseline 0f2d7c60b1a293f312a3f2ec7829958bc7c9241b on assignment3_part3; earlier Part 3.2 observations above remain historical and are not reclassified as new tests.
+
+| Input/action | Expected | Observed | Result / boundary |
+| --- | --- | --- | --- |
+| Map fictional evaluation cases to existing evidence | Exactly 15 scenarios and three explicit behavior checks | S01–S15 and BC1–BC3 documented with exact test names and explicit manual gaps | Completed documentation; PASS applies only to recorded test scope |
+| Rerun full isolated backend/frontend suites | Regressions pass with mocked provider behavior | 393 backend tests passed (6.19 seconds; one existing deprecation warning), 111 frontend tests passed | PASS; no live inference |
+| Non-fixing Oxlint/ESLint and production build | Successful checks without auto-fixes | Both linters exit 0; build exit 0, 54 modules, both HTML entries emitted | PASS |
+| Whitespace and evaluation structure/local-link checks | No defects, correct counts and existing file targets | Checks passed | PASS locally; new documentation is not published |
+| Plan later model/boundary selection | Three fictional cases with clear expected outcomes | LIVE-1 and LIVE-2 plan real inferences; LIVE-3 requires deterministic bypass and zero provider calls | PENDING execution; no observed live results |
+
+No new manual browser interaction, server restart, working-database inspection/write, provider request or recording was performed. Existing saved-conversation placement evidence is reused as a process-screencast candidate; no original footage or new reconstruction is claimed. Comprehensive screen-reader testing, active interruption checks, conversation persistence after actual server restart and personalized live responses remain unverified within their stated scopes. The evaluation package adds no app redesign or final report, and no commit or push was made. See [Part 3.3 evaluation](../part3.3/evaluation.md) and [verification](../part3.3/verification.md).
