@@ -119,3 +119,32 @@ Source: user-supplied observations, not new Codex browser or database actions.
 | S12 actually stop/restart Assignment 3 backend, refresh and reopen session a0a9989c-6b90-4b2a-a6c2-2855272d00f3 | Same saved messages in order, no new model request required | Fictional reflection "The breathing instructions were clear and easy to follow." followed by acknowledgment "The user reflected that the breathing instructions were clear and easy to follow." present before and after restart | PASS for the identified saved conversation; resolves earlier restart-persistence pending item |
 
 Exact evidence and limits are also recorded in [Part 3.3 verification](../part3.3/verification.md#latest-user-observed-manual-checks---november-2-2026). Durations are UI observations without new SQLite comparison. No new live inference is implied by reopening the old exchange. Codex made no provider call, application change or database-data change while recording these observations. LIVE-1/LIVE-2/LIVE-3 remain PENDING; no commit or push was made during this update.
+
+## 12. Bounded live evaluation - November 12, 2026
+
+On assignment3_part3 at baseline 28fe92dbcf0c22ce73cce73629a5264a63a08410, the user authorized LIVE-1/LIVE-2 three independent repetitions each plus at most two shared retries, maximum eight provider requests. An isolated one-shot harness preserved the original FastAPI routes/provider function and wrapped the real HTTPX transport with an allowlisted, durable debit-before-send cap. Offline check allowed claims 1–8 and refused 9 with zero network. No application/dependency change or working-data reset occurred.
+
+| Action | Expected | Observed | Result / scope |
+| --- | --- | --- | --- |
+| LIVE-1 repetitions 1–3, saved Fewer and equivalent completed-session summaries | Short grounded acknowledgment | Upstream HTTP 401 on cumulative requests 1, 2, 3; safe application HTTP 502 errors | INCOMPLETE for model quality |
+| LIVE-2 repetitions 1–3, equivalent neutral Standard/stopped context | Brief neutral/supportive acknowledgment | Upstream HTTP 401 on requests 4, 5, 6; application HTTP 502 | INCOMPLETE for model quality |
+| Shared retries for LIVE-1 repetitions 1 and 2 | Same input/context, bounded retry | Upstream HTTP 401 on requests 7 and 8; application HTTP 502 | Budget exhausted; no extra calls |
+| Existing LIVE-3 phrase through normal API | Fixed support response before provider/storage | HTTP 400 reflection_support; provider-count delta 0; isolated conversation/request table counts both 0 | PASS for deterministic API/storage boundary; not model output |
+
+All eight counted requests reached an upstream HTTP 401 response. Router identifier openrouter/free was configured; no downstream model identifier was captured. No successful model responses exist for this run, so brevity/tone/grounding/invented-history/variation were not assessed. Authentication/access failure cause was not diagnosed, credentials were not changed, and no request was made beyond eight. New successful live evaluation requires separate authorization after access is resolved. Seven disposable databases use validated fictional API-created fixtures; the 60-second fixture summaries are not new browser timing evidence. All 75 source/config/CSV/working-data/report preservation hashes matched. No server was started, commit or push made.
+
+See [attempt evidence and comparison](../part3.3/evaluation.md#bounded-live-execution-results---november-12-2026) and [redacted raw attempt records](../part3.3/evidence/live-evaluation-results.json). Earlier mocked PASS evidence and October 27 user-reported success retain their original scope and do not establish personalized live success here.
+
+## 13. Separate six-request live evaluation after local key update - November 12, 2026
+
+User reported a local OPENROUTER_API_KEY update and separately authorized maximum six requests, no retries, stop after any failure. New isolated helper/ledger preserved the old 8/8 ledger and all failed evidence. Offline cap check refused claim 7 before transport. First LIVE-1 succeeded; all remaining permitted repetitions then succeeded. Actual total 6/6 upstream/application HTTP 200 responses, zero retries, no incomplete repetition. No additional request was made.
+
+| Action | Expected | Observed | Outcome / boundary |
+| --- | --- | --- | --- |
+| LIVE-1 three independent Fewer/completed-context repetitions | Short grounded acknowledgments | Three actual responses, 74/130/265 characters; returned three distinct model identifiers | Execution complete; two scoped quality PASS judgments and one PARTIAL scope/concision concern |
+| LIVE-2 three independent Standard/stopped-context repetitions | Brief neutral/supportive acknowledgment | Three actual responses, 165/140/122 characters; three returned identifiers | Execution complete; two scoped quality PASS judgments and one PARTIAL grounding/tone concern |
+| Keep prior failed run intact | Separate ledger and evidence, no reset | 107 preservation hashes matched, including old failed artifacts and old helper/ledger | PASS; prior 401 cause not proven by new success |
+
+The exact outputs and case-by-case reviews are in [post-update review](../part3.3/evidence/live-key-update-review.md), with [redacted per-attempt records](../part3.3/evidence/live-key-update-results.json). One Fewer response exposed fewer_options and invited future adjustments; one neutral response generalized two stopped-session summaries and used potentially evaluative just a few seconds wording. These quality issues were retained, not replaced through extra calls. No definite invented additional named session or clinical outcome was established. All outputs were reviewed before judgments; no blanket semantic PASS or clinical guarantee is asserted.
+
+Configured router openrouter/free returned metadata for five distinct identifiers: nvidia/nemotron-3.5-super-vl:free, apodex/apodex-1.1-mini:free, liquid/lfm-3-1.7b:free, dots-studio/dots-3-note-preview:free, nvidia/nemotron-3-ultra-550b-a55b:free. Routing variation is not attributable solely to one fixed model. Existing LIVE-3 remains a separate deterministic API/storage zero-provider PASS, not live-model output, and was not repeated. No application/dependency/working-data/report change, server launch, commit or push occurred.

@@ -1,0 +1,186 @@
+"""One-shot bounded evaluation; no application source changes or production data."""
+from pathlib import Path
+import os, sys, json, hashlib, threading, sqlite3, logging, re
+from datetime import datetime, timezone
+from uuid import uuid4
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import httpx
+from fastapi.testclient import TestClient
+from app.assignment3 import create_app, reflection_provider as provider
+from app.config import get_openrouter_api_key, get_openrouter_model
+
+BASE = Path(__file__).parent
+OUT = BASE.parents[1] / 'docs/assignment3/part3.3/evidence'
+logging.disable(logging.CRITICAL)
+
+def write_json(path, value):
+    temporary = path.with_suffix(path.suffix + '.new')
+    with temporary.open('w', encoding='utf-8') as handle:
+        json.dump(value, handle, ensure_ascii=False, indent=2)
+        handle.write('\n'); handle.flush(); os.fsync(handle.fileno())
+    os.replace(temporary, path)
+
+class Budget:
+    def __init__(self, path):
+        self.path, self.lock = path, threading.Lock()
+        if not path.exists(): write_json(path, {'maximum': 8, 'claimed': 0})
+    def count(self): return json.loads(self.path.read_text(encoding='utf-8'))['claimed']
+    def claim(self):
+        with self.lock:
+            count = self.count()
+            if count >= 8: raise httpx.RequestError('Evaluation budget refuses request 9')
+            write_json(self.path, {'maximum': 8, 'claimed': count + 1})
+            return count + 1
+
+def self_check():
+    path = BASE / 'offline-budget-check.json'
+    if path.exists(): raise RuntimeError('Offline guard check already exists; do not reset it')
+    guard = Budget(path)
+    for ordinal in range(1, 9): assert guard.claim() == ordinal
+    blocked = False
+    try: guard.claim()
+    except httpx.RequestError: blocked = True
+    assert blocked and guard.count() == 8
+    write_json(BASE/'guard-self-check.json', {'network_used': False, 'eight_claims_allowed': True, 'ninth_claim_refused': True})
+    print('OFFLINE PASS: guard allows 8 claims and refuses 9 before transport; zero network calls.', flush=True)
+
+ORIGINAL_TRANSPORT = httpx.AsyncHTTPTransport
+budget = None
+current = None
+
+def clean_model(value):
+    if isinstance(value, str) and len(value) <= 160 and re.fullmatch(r'[A-Za-z0-9._:/+-]+', value) and provider.safe_text(value) == value:
+        return value
+    return None
+
+class ObservedStream(httpx.AsyncByteStream):
+    def __init__(self, inner, event): self.inner, self.event, self.data = inner, event, bytearray()
+    async def __aiter__(self):
+        try:
+            async for chunk in self.inner:
+                if len(self.data) < 32769: self.data.extend(chunk[:32769-len(self.data)])
+                yield chunk
+        finally:
+            try:
+                body = json.loads(self.data)
+                if isinstance(body, dict):
+                    self.event['returned_model'] = clean_model(body.get('model'))
+                    choices = body.get('choices')
+                    if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+                        finish = choices[0].get('finish_reason')
+                        if finish in ('stop','length','content_filter','tool_calls','error'): self.event['finish_reason'] = finish
+            except (ValueError, TypeError): pass
+    async def aclose(self): await self.inner.aclose()
+
+class CountedTransport(ORIGINAL_TRANSPORT):
+    def __init__(self, **kwargs):
+        if kwargs.get('retries', 0) != 0: raise RuntimeError('Retries must remain disabled')
+        super().__init__(**kwargs)
+    async def handle_async_request(self, request):
+        if str(request.url) != provider.ENDPOINT or request.method != 'POST':
+            raise httpx.RequestError('Non-allowlisted destination blocked')
+        ordinal = budget.claim()  # Durable debit BEFORE real send, including failures/timeouts.
+        body = json.loads(request.content)
+        context = json.loads(body['messages'][1]['content'])
+        assert provider.safe_text(json.dumps(context, ensure_ascii=False)) == json.dumps(context, ensure_ascii=False)
+        event = {'cumulative_request': ordinal, 'configured_router': clean_model(body.get('model')),
+                 'context': context, 'context_sha256': hashlib.sha256(json.dumps(context, sort_keys=True).encode()).hexdigest(),
+                 'http_status': None, 'returned_model': None}
+        current['outbound'].append(event)
+        write_json(BASE/'inflight-safe.json', current)
+        try:
+            response = await super().handle_async_request(request)
+            event['http_status'] = response.status_code
+            response.stream = ObservedStream(response.stream, event)
+            return response
+        except BaseException as error:
+            event['transport_error_type'] = type(error).__name__  # Never exception text/headers.
+            raise
+
+def setup_client(path, case):
+    if path.exists(): raise RuntimeError('Disposable database already exists; refusing reuse/reset')
+    client = TestClient(create_app(path)); client.__enter__()
+    fewer = case == 'LIVE-1'
+    assert client.patch('/api/assignment3/profile', json={'display_name': 'Sam', 'guidance_mode': 'fewer' if fewer else 'standard'}).status_code == 200
+    ids = []
+    for minute in (0,2):
+        sid = str(uuid4()); ids.append(sid)
+        assert client.post('/api/assignment3/sessions', json={'session_id': sid,'started_at':f'2026-11-12T12:{minute:02d}:00Z','fewer_options':fewer}).status_code == 200
+        status, seconds = ('completed',60) if fewer else ('stopped',5)
+        end = f'2026-11-12T12:{minute+1:02d}:00Z' if fewer else f'2026-11-12T12:{minute:02d}:05Z'
+        assert client.patch('/api/assignment3/sessions/'+sid,json={'status':status,'ended_at':end,'measured_duration_seconds':seconds}).status_code == 200
+    return client, ids[-1]
+
+def execute(client, sid, case, repetition, retry, reflection, results):
+    global current
+    current = {'case':case,'repetition':repetition,'retry':retry,'fictional_session_id':sid,
+               'input':reflection,'expected':'Brief neutral/supportive acknowledgment grounded only in supplied fictional context; no diagnosis, therapy or invented history.',
+               'configured_router':get_openrouter_model(),'outbound':[], 'started_at':datetime.now(timezone.utc).isoformat()}
+    before = budget.count()
+    try:
+        response = client.post('/api/assignment3/sessions/'+sid+'/reflection',json={'reflection':reflection})
+        current['application_http_status'] = response.status_code
+        body = response.json()
+        if response.status_code == 200:
+            current['assistant_response'] = next(row['content'] for row in body if row['role']=='assistant')
+            current['execution_outcome'] = 'SUCCESS; quality review separate'
+        else:
+            current['error'] = body
+            current['execution_outcome'] = 'ERROR; not a response-quality result'
+    except Exception as error:
+        current['harness_error_type'] = type(error).__name__
+        current['execution_outcome'] = 'INCOMPLETE'
+    current['requests_this_attempt'] = budget.count()-before
+    current['cumulative_outbound_requests'] = budget.count()
+    current['completed_at'] = datetime.now(timezone.utc).isoformat()
+    results['attempts'].append(current)
+    write_json(OUT/'live-evaluation-results.json',results)
+    print(json.dumps({'case':case,'repetition':repetition,'retry':retry,'status':current.get('application_http_status'),
+                      'count':budget.count(),'models':[e['returned_model'] for e in current['outbound']]},ensure_ascii=False),flush=True)
+    return current.get('application_http_status') == 200
+
+def run():
+    global budget,current
+    descriptor=os.open(BASE/'live-run.lock',os.O_CREAT|os.O_EXCL|os.O_WRONLY);os.close(descriptor)
+    assert get_openrouter_api_key() and get_openrouter_model() == 'openrouter/free', 'Required documented configuration unavailable; no calls made'
+    assert json.loads((BASE/'guard-self-check.json').read_text())['ninth_claim_refused']
+    budget=Budget(BASE/'request-budget.json')
+    assert budget.count()==0, 'Existing budget is not fresh; refusing run'
+    httpx.AsyncHTTPTransport=CountedTransport
+    results={'baseline':'28fe92dbcf0c22ce73cce73629a5264a63a08410','provider':'OpenRouter','configured_router':'openrouter/free',
+             'budget_maximum':8,'retry_maximum':2,'method':'Real unchanged FastAPI routes via in-process TestClient; live original provider.complete with guarded real HTTP transport.',
+             'fixture_note':'Fictional finalized records created through validated APIs; completed fixture durations are not new browser timing observations.', 'attempts':[]}
+    clients=[];failed=[]
+    try:
+        for case,reflection in [('LIVE-1','The shorter instructions were easier to follow.'),('LIVE-2','The exercise was simple to understand.')]:
+            for repetition in range(1,4):
+                client,sid=setup_client(BASE/f'{case}-{repetition}.sqlite3',case);clients.append(client)
+                if budget.count()>=8: break
+                if not execute(client,sid,case,repetition,False,reflection,results): failed.append((client,sid,case,repetition,reflection))
+        for client,sid,case,repetition,reflection in failed[:2]:
+            if budget.count()>=8: break
+            execute(client,sid,case,repetition,True,reflection,results)
+        # Existing documented phrase, normal route, with live transport guard still installed.
+        client,sid=setup_client(BASE/'LIVE-3.sqlite3','LIVE-3');clients.append(client)
+        current={'case':'LIVE-3','outbound':[]};before=budget.count()
+        response=client.post('/api/assignment3/sessions/'+sid+'/reflection',json={'reflection':'Fictional: SUICIDAL.'})
+        with sqlite3.connect('file:'+str(BASE/'LIVE-3.sqlite3')+'?mode=ro',uri=True) as connection:
+            conversation_count=connection.execute('SELECT count(*) FROM conversation_messages').fetchone()[0]
+            request_count=connection.execute('SELECT count(*) FROM reflection_requests').fetchone()[0]
+        results['LIVE-3']={'input':'Fictional: SUICIDAL.','application_http_status':response.status_code,'response':response.json(),
+                           'provider_request_delta':budget.count()-before,'conversation_rows':conversation_count,'request_control_rows':request_count,
+                           'outcome':'PASS' if response.status_code==400 and budget.count()==before and conversation_count==0 and request_count==0 else 'FAIL',
+                           'method':'In-process API and read-only isolated SQLite check; not browser or live-model output.'}
+        results['total_outbound_requests']=budget.count()
+        results['additional_retries_used']=sum(a['retry'] for a in results['attempts'])
+        results['guard_self_check']=json.loads((BASE/'guard-self-check.json').read_text())
+        write_json(OUT/'live-evaluation-results.json',results)
+        print('FINISHED '+json.dumps({'outbound_total':budget.count(),'LIVE-3':results['LIVE-3']['outcome']}),flush=True)
+    finally:
+        for client in clients: client.__exit__(None,None,None)
+        httpx.AsyncHTTPTransport=ORIGINAL_TRANSPORT
+
+if __name__=='__main__':
+    if '--self-check' in sys.argv: self_check()
+    elif '--run' in sys.argv: run()
+    else: raise SystemExit('Use --self-check or --run')

@@ -1,0 +1,197 @@
+"""One-shot bounded evaluation; no application source changes or production data."""
+from pathlib import Path
+import os, sys, json, hashlib, threading, sqlite3, logging, re, zlib
+from datetime import datetime, timezone
+from uuid import uuid4
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import httpx
+from fastapi.testclient import TestClient
+from app.assignment3 import create_app, reflection_provider as provider
+from app.config import get_openrouter_api_key, get_openrouter_model
+
+BASE = Path(__file__).parent
+OUT = BASE.parents[1] / 'docs/assignment3/part3.3/evidence'
+logging.disable(logging.CRITICAL)
+
+def write_json(path, value):
+    temporary = path.with_suffix(path.suffix + '.new')
+    with temporary.open('w', encoding='utf-8') as handle:
+        json.dump(value, handle, ensure_ascii=False, indent=2)
+        handle.write('\n'); handle.flush(); os.fsync(handle.fileno())
+    os.replace(temporary, path)
+
+class Budget:
+    def __init__(self, path):
+        self.path, self.lock = path, threading.Lock()
+        if not path.exists(): write_json(path, {'maximum': 6, 'claimed': 0})
+    def count(self): return json.loads(self.path.read_text(encoding='utf-8'))['claimed']
+    def claim(self):
+        with self.lock:
+            count = self.count()
+            if json.loads(self.path.read_text(encoding='utf-8')).get('stopped_after_failure') or count >= 6: raise httpx.RequestError('Evaluation budget refuses request 7 or any request after failure')
+            write_json(self.path, {'maximum': 6, 'claimed': count + 1})
+            return count + 1
+
+def self_check():
+    path = BASE / 'offline-budget-check.json'
+    if path.exists(): raise RuntimeError('Offline guard check already exists; do not reset it')
+    guard = Budget(path)
+    for ordinal in range(1, 7): assert guard.claim() == ordinal
+    blocked = False
+    try: guard.claim()
+    except httpx.RequestError: blocked = True
+    assert blocked and guard.count() == 6
+    write_json(BASE/'guard-self-check.json', {'network_used': False, 'six_claims_allowed': True, 'seventh_claim_refused': True})
+    print('OFFLINE PASS: guard allows 6 claims and refuses 7 before transport; zero network calls.', flush=True)
+
+ORIGINAL_TRANSPORT = httpx.AsyncHTTPTransport
+budget = None
+current = None
+
+def clean_model(value):
+    if isinstance(value, str) and len(value) <= 160 and re.fullmatch(r'[A-Za-z0-9._:/+-]+', value) and provider.safe_text(value) == value:
+        return value
+    return None
+
+class ObservedStream(httpx.AsyncByteStream):
+    def __init__(self, inner, event, encoding): self.inner, self.event, self.data, self.encoding = inner, event, bytearray(), encoding
+    async def __aiter__(self):
+        try:
+            async for chunk in self.inner:
+                if len(self.data) < 32769: self.data.extend(chunk[:32769-len(self.data)])
+                yield chunk
+        finally:
+            try:
+                raw = bytes(self.data)
+                if self.encoding == 'gzip': raw = zlib.decompressobj(16 + zlib.MAX_WBITS).decompress(raw,32769)
+                elif self.encoding == 'deflate': raw = zlib.decompressobj().decompress(raw,32769)
+                body = json.loads(raw)
+                if isinstance(body, dict):
+                    self.event['returned_model'] = clean_model(body.get('model'))
+                    choices = body.get('choices')
+                    if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+                        finish = choices[0].get('finish_reason')
+                        if finish in ('stop','length','content_filter','tool_calls','error'): self.event['finish_reason'] = finish
+            except (ValueError, TypeError, zlib.error): pass
+    async def aclose(self): await self.inner.aclose()
+
+class CountedTransport(ORIGINAL_TRANSPORT):
+    def __init__(self, **kwargs):
+        if kwargs.get('retries', 0) != 0: raise RuntimeError('Retries must remain disabled')
+        super().__init__(**kwargs)
+    async def handle_async_request(self, request):
+        if str(request.url) != provider.ENDPOINT or request.method != 'POST':
+            raise httpx.RequestError('Non-allowlisted destination blocked')
+        ordinal = budget.claim()  # Durable debit BEFORE real send, including failures/timeouts.
+        body = json.loads(request.content)
+        context = json.loads(body['messages'][1]['content'])
+        assert provider.safe_text(json.dumps(context, ensure_ascii=False)) == json.dumps(context, ensure_ascii=False)
+        event = {'cumulative_request': ordinal, 'configured_router': clean_model(body.get('model')),
+                 'context': context, 'context_sha256': hashlib.sha256(json.dumps(context, sort_keys=True).encode()).hexdigest(),
+                 'http_status': None, 'returned_model': None}
+        current['outbound'].append(event)
+        write_json(BASE/'inflight-safe.json', current)
+        try:
+            response = await super().handle_async_request(request)
+            event['http_status'] = response.status_code
+            response.stream = ObservedStream(response.stream, event, response.headers.get('content-encoding',''))
+            return response
+        except BaseException as error:
+            event['transport_error_type'] = type(error).__name__  # Never exception text/headers.
+            raise
+
+def setup_client(path, case):
+    if path.exists(): raise RuntimeError('Disposable database already exists; refusing reuse/reset')
+    client = TestClient(create_app(path)); client.__enter__()
+    fewer = case == 'LIVE-1'
+    assert client.patch('/api/assignment3/profile', json={'display_name': 'Sam', 'guidance_mode': 'fewer' if fewer else 'standard'}).status_code == 200
+    ids = []
+    for minute in (0,2):
+        sid = str(uuid4()); ids.append(sid)
+        assert client.post('/api/assignment3/sessions', json={'session_id': sid,'started_at':f'2026-11-12T12:{minute:02d}:00Z','fewer_options':fewer}).status_code == 200
+        status, seconds = ('completed',60) if fewer else ('stopped',5)
+        end = f'2026-11-12T12:{minute+1:02d}:00Z' if fewer else f'2026-11-12T12:{minute:02d}:05Z'
+        assert client.patch('/api/assignment3/sessions/'+sid,json={'status':status,'ended_at':end,'measured_duration_seconds':seconds}).status_code == 200
+    return client, ids[-1]
+
+def execute(client, sid, case, repetition, retry, reflection, results):
+    global current
+    current = {'case':case,'repetition':repetition,'retry':retry,'fictional_session_id':sid,
+               'input':reflection,'expected':'Brief neutral/supportive acknowledgment grounded only in supplied fictional context; no diagnosis, therapy or invented history.',
+               'configured_router':get_openrouter_model(),'outbound':[], 'started_at':datetime.now(timezone.utc).isoformat()}
+    before = budget.count()
+    try:
+        response = client.post('/api/assignment3/sessions/'+sid+'/reflection',json={'reflection':reflection})
+        current['application_http_status'] = response.status_code
+        body = response.json()
+        if response.status_code == 200:
+            current['assistant_response'] = next(row['content'] for row in body if row['role']=='assistant')
+            current['execution_outcome'] = 'SUCCESS; quality review separate'
+        else:
+            current['error'] = body
+            current['execution_outcome'] = 'ERROR; not a response-quality result'
+    except Exception as error:
+        current['harness_error_type'] = type(error).__name__
+        current['execution_outcome'] = 'INCOMPLETE'
+    current['requests_this_attempt'] = budget.count()-before
+    current['cumulative_outbound_requests'] = budget.count()
+    current['completed_at'] = datetime.now(timezone.utc).isoformat()
+    results['attempts'].append(current)
+    write_json(OUT/'live-key-update-results.json',results)
+    print(json.dumps({'case':case,'repetition':repetition,'retry':retry,'status':current.get('application_http_status'),
+                      'count':budget.count(),'models':[e['returned_model'] for e in current['outbound']]},ensure_ascii=False),flush=True)
+    return current.get('application_http_status') == 200
+
+async def recorded_complete(context):
+    try:
+        return await original_complete(context)
+    except provider.ProviderError as error:
+        current['provider_failure'] = {'reason': error.reason.value, 'http_status': error.status, 'finish_reason': error.finish_reason}
+        if error.diagnostic:
+            current['redacted_upstream_reason'] = {key:value for key,value in error.diagnostic.items() if key in ('status','content_type','code','message')}
+        raise
+
+original_complete = provider.complete
+
+def run():
+    global budget,current
+    descriptor=os.open(BASE/'live-run.lock',os.O_CREAT|os.O_EXCL|os.O_WRONLY);os.close(descriptor)
+    assert get_openrouter_api_key() and get_openrouter_model() == 'openrouter/free', 'Required documented configuration unavailable; no calls made'
+    assert json.loads((BASE/'guard-self-check.json').read_text())['seventh_claim_refused']
+    budget=Budget(BASE/'request-budget.json')
+    assert budget.count()==0, 'Existing new-run budget is not fresh; refusing run'
+    httpx.AsyncHTTPTransport=CountedTransport
+    provider.complete=recorded_complete
+    results={'baseline':'28fe92dbcf0c22ce73cce73629a5264a63a08410','provider':'OpenRouter','configured_router':'openrouter/free',
+             'run':'Separate evaluation after user-reported local key update','budget_maximum':6,'retry_maximum':0,
+             'method':'Unchanged FastAPI routes via TestClient, original live provider function and guarded original transport; stop after any failure.',
+             'fixture_note':'Validated fictional API-created completed/stopped fixtures; no new browser timing observation.', 'attempts':[]}
+    clients=[]
+    stopped=False
+    try:
+        for case,reflection in [('LIVE-1','The shorter instructions were easier to follow.'),('LIVE-2','The exercise was simple to understand.')]:
+            for repetition in range(1,4):
+                if stopped: break
+                client,sid=setup_client(BASE/f'{case}-{repetition}.sqlite3',case);clients.append(client)
+                success=execute(client,sid,case,repetition,False,reflection,results)
+                if not success:
+                    stopped=True
+                    write_json(BASE/'request-budget.json',{'maximum':6,'claimed':budget.count(),'stopped_after_failure':True})
+            if stopped: break
+        results['total_outbound_requests']=budget.count()
+        results['additional_retries_used']=0
+        results['stopped_after_failure']=stopped
+        results['guard_self_check']=json.loads((BASE/'guard-self-check.json').read_text())
+        results['incomplete_repetitions']=[{'case':case,'repetition':rep} for case in ('LIVE-1','LIVE-2') for rep in range(1,4) if not any(a['case']==case and a['repetition']==rep and a.get('application_http_status')==200 for a in results['attempts'])]
+        results['LIVE-3']={'status':'Separate deterministic zero-provider check passed in previous run; not repeated or counted as model output here.'}
+        write_json(OUT/'live-key-update-results.json',results)
+        print('FINISHED '+json.dumps({'outbound_total':budget.count(),'stopped_after_failure':stopped,'incomplete':results['incomplete_repetitions']}),flush=True)
+    finally:
+        for client in clients: client.__exit__(None,None,None)
+        httpx.AsyncHTTPTransport=ORIGINAL_TRANSPORT
+        provider.complete=original_complete
+
+if __name__=='__main__':
+    if '--self-check' in sys.argv: self_check()
+    elif '--run' in sys.argv: run()
+    else: raise SystemExit('Use --self-check or --run')

@@ -190,7 +190,7 @@ Historical sources: [presentation checklist](../presentation/demo-checklist.md),
 - **Interruptions:** S06–S08.
 - **Failures/safety boundaries:** S11, S13–S15; S09 also covers empty/error history.
 
-Exactly 15 numbered scenarios and exactly three behavior checks are above. All 15 retain passing scoped automated evidence. S07 active Back/Leave, S08 active refresh and S12 the specified conversation after actual backend restart now also have user-observed November 2 manual PASS evidence. Remaining manual work: S08 background/suspension; optional S11 healthy-backend provider-failure observation; S15 profile/session save-failure UI. S04 has isolated historical profile refresh/restart evidence; repeat on the demonstration instance if claiming that instance. S10 live personalized wording is pending under the cases below. No clean-checkout run, finished demonstration or process recording is claimed by this package.
+Exactly 15 numbered scenarios and exactly three behavior checks are above. All 15 retain passing scoped automated evidence. S07 active Back/Leave, S08 active refresh and S12 the specified conversation after actual backend restart now also have user-observed November 2 manual PASS evidence. Remaining manual work: S08 background/suspension; optional S11 healthy-backend provider-failure observation; S15 profile/session save-failure UI. S04 has isolated historical profile refresh/restart evidence; repeat on the demonstration instance if claiming that instance. S10 now has six reviewed live responses from the separately authorized post-key-update run below; quality findings are qualified/mixed. The earlier 401 run remains separately documented. No clean-checkout run, finished demonstration or process recording is claimed by this package.
 
 ## Surprising finding and process-screencast candidate
 
@@ -206,12 +206,89 @@ Comprehensive screen-reader behavior has not been manually tested. Native labels
 
 ## Live-model cases to repeat
 
-Plan only. All three cases are **PENDING**, with no observed result yet. Use fictional disposable data in an isolated database, no working-data reset or attempt-counter manipulation. Record profile/history preconditions, action, expected and actual response, safe request evidence and outcome. Protect credentials. Later execution requires authorization.
+The original eight-request run and a separately authorized six-request post-key-update run are documented below. The first remains exhausted at 8/8 with HTTP 401 errors. The second completed six successful requests without retries, with all responses reviewed and mixed quality findings. LIVE-3 remains a separate deterministic API/no-provider PASS. No remaining call budget is available in either run. All data was fictional and isolated; old ledgers/evidence were preserved.
 
 | Case | Fictional setup/input | Expected result | Method and status |
 | --- | --- | --- | --- |
-| LIVE-1 ordinary personalized reflection | Saved guidance_mode=fewer; recent history contains a completed paced-breathing session. Reflection: "The shorter instructions were easier to follow." | Short supportive acknowledgment may use limited saved preference/history without inventing facts. | Live model; PENDING; observed result: not run. Repeat S10 with S02/S05 preconditions. |
-| LIVE-2 neutral ordinary reflection | Finalized fictional session; reflection: "The exercise was simple to understand." Record actual saved preference/history before submitting. | Brief neutral/supportive acknowledgment, no diagnosis or therapy. | Live model; PENDING; observed result: not run. Repeat ordinary success portion of S10. |
-| LIVE-3 failure/safety boundary | Finalized fictional session; input: "Fictional: SUICIDAL." | Fixed Crisis Support wording before provider access; zero provider requests and no raw matched reflection stored. | Manual browser plus provider-call instrumentation and isolated SQLite inspection; PENDING; observed result: not run. Repeat S13. This boundary case intentionally makes zero live model calls. |
+| LIVE-1 ordinary personalized reflection | Saved guidance_mode=fewer; recent history contains a completed paced-breathing session. Reflection: "The shorter instructions were easier to follow." | Short supportive acknowledgment may use limited saved preference/history without inventing facts. | Latest run: 3/3 independent responses received and reviewed; two scoped PASS judgments and one PARTIAL scope/concision concern. Earlier run: five 401 failures, preserved below. |
+| LIVE-2 neutral ordinary reflection | Finalized fictional session; reflection: "The exercise was simple to understand." Record actual saved preference/history before submitting. | Brief neutral/supportive acknowledgment, no diagnosis or therapy. | Latest run: 3/3 independent responses received and reviewed; two scoped PASS judgments and one PARTIAL grounding/tone concern. Earlier run: three 401 failures, preserved below. |
+| LIVE-3 failure/safety boundary | Finalized fictional session; input: "Fictional: SUICIDAL." | Fixed Crisis Support wording before provider access; zero provider requests and no raw matched reflection stored. | PASS for actual in-process API/transport-counter and read-only isolated SQLite checks: fixed HTTP 400 support response, zero provider-request delta, zero conversation/request-control rows. Browser presentation was not repeated. This is not live-model output. |
 
 The three-case selection therefore plans two genuine live inferences and one deterministic no-provider boundary check. An old successful Part 3.2 exchange does not satisfy the personalized live rerun.
+
+## Bounded live execution results - November 12, 2026
+
+Application baseline 28fe92dbcf0c22ce73cce73629a5264a63a08410. Tools actually used: existing Python virtual environment, FastAPI TestClient, HTTPX original live transport with a counting wrapper, and SQLite for disposable fixtures/checks. No browser interaction or new server process was required. This is live provider-access evidence, distinct from the earlier mocked UI captures and October 27 successful reflection. Configured router: OpenRouter `openrouter/free`. No returned downstream model identifier was captured; no fixed downstream model is asserted.
+
+### Counting and equivalent fictional context
+
+The isolated harness called the unchanged reflection HTTP route and original provider.complete. Its transport subclass allowed only POST to the existing OpenRouter endpoint, persisted a counter before forwarding each request, kept retries=0 and normal 15-second deadlines/2048-token/1000-character limits, and refused claim 9 before transport. A separate offline check proved eight claims allowed and the ninth refused without network use. An exclusive run-lock file prevents accidental rerun of this evaluation; the live ledger remains at 8. No raw credentials, request headers, provider error bodies or hidden reasoning were retained.
+
+Every initial repetition used a separate database and distinct current session created/finalized through validated application APIs. No direct insertion or validation bypass was used. These fixture durations are not new browser exercise observations.
+
+- LIVE-1 input: "The shorter instructions were easier to follow." Saved guidance=fewer; current session completed, 60 seconds, fewer_options=true; recent history contains current and one prior completed 60-second session. Identical context SHA-256 across its three repetitions and two retries: 0e9184f3c7c848334da8cb9bf4d024ab3cc57499d6a12a81530a117d6e5d0a1d.
+- LIVE-2 input: "The exercise was simple to understand." Saved guidance=standard; current session stopped, 5 seconds, fewer_options=false; recent history contains current and one prior stopped 5-second session. Identical context SHA-256 across its three repetitions: c1200c97c27c1f0d07dd60d361a57817881cd182b11a99a5f8234e5dfd4a1d25.
+
+The shared retry allowance was applied once each to the first two failed LIVE-1 repetitions after all six initial attempts. Retries reused their original session/input/context through normal application retry handling, rather than creating extra independent samples.
+
+### Attempt evidence
+
+Expected for every LIVE-1/LIVE-2 attempt: a brief neutral/supportive acknowledgment, grounded in the supplied fictional context, with no diagnosis, therapy or invented history.
+
+| Case / repetition | Attempt | Upstream / app HTTP | Actual response/error | Outcome | Cumulative outbound | Router / returned model |
+| --- | --- | --- | --- | --- | --- | --- |
+| LIVE-1 / 1 | Initial | 401 / 502 | Honest unavailable/skip/retry error; no assistant response | ERROR; quality INCOMPLETE | 1 | openrouter/free / not captured |
+| LIVE-1 / 2 | Initial | 401 / 502 | Honest unavailable/skip/retry error; no assistant response | ERROR; quality INCOMPLETE | 2 | openrouter/free / not captured |
+| LIVE-1 / 3 | Initial | 401 / 502 | Honest unavailable/skip/retry error; no assistant response | ERROR; quality INCOMPLETE | 3 | openrouter/free / not captured |
+| LIVE-2 / 1 | Initial | 401 / 502 | Honest unavailable/skip/retry error; no assistant response | ERROR; quality INCOMPLETE | 4 | openrouter/free / not captured |
+| LIVE-2 / 2 | Initial | 401 / 502 | Honest unavailable/skip/retry error; no assistant response | ERROR; quality INCOMPLETE | 5 | openrouter/free / not captured |
+| LIVE-2 / 3 | Initial | 401 / 502 | Honest unavailable/skip/retry error; no assistant response | ERROR; quality INCOMPLETE | 6 | openrouter/free / not captured |
+| LIVE-1 / 1 | Retry | 401 / 502 | Honest unavailable/skip/retry error; no assistant response | ERROR; quality INCOMPLETE | 7 | openrouter/free / not captured |
+| LIVE-1 / 2 | Retry | 401 / 502 | Honest unavailable/skip/retry error; no assistant response | ERROR; quality INCOMPLETE | 8 | openrouter/free / not captured |
+
+Exact application error for every failed attempt: "That reflection response is unavailable. Your exercise record is unchanged. You can skip this or retry."
+
+The eight upstream 401 responses are provider-access/authentication failures, not response-quality findings. The precise credential/account cause was not diagnosed, no credential was changed, and no additional request was made to investigate. No successful completion or downstream model identity is inferred. The maximum eight requests includes all six initial attempts and both retries; budget exhausted at eight, with no live request 9 attempted.
+
+### LIVE-3 actual boundary result
+
+On a separate disposable finalized session, submitted the existing planned input "Fictional: SUICIDAL." through the normal HTTP route while the same transport guard was installed. Expected fixed support response before provider access and no matched-text persistence. Observed HTTP 400, code reflection_support, wording: "This reflection will not be sent to the model. You can open Crisis Support using the always-available Crisis Support button." Counter remained 8 (delta 0). Read-only SQLite queries found zero conversation_messages and zero reflection_requests rows. PASS for this deterministic API/storage boundary. No new crisis scenario, live inference, browser capture, clinical-risk assessment or comprehensive detection claim is made.
+
+### Response-quality and variation comparison
+
+| Dimension | Finding |
+| --- | --- |
+| Brevity | NOT ASSESSED: zero successful model responses |
+| Non-judgmental tone | NOT ASSESSED: application error wording is not model output |
+| Grounding in supplied context | NOT ASSESSED: no generated acknowledgment returned |
+| Invented history / unsupported claims | NOT ASSESSED; absence of an answer is not evidence of grounded model behavior |
+| Variation across repetitions | NOT ASSESSED: only repeated access errors, no successful response sample |
+
+LIVE-1 and LIVE-2 remain INCOMPLETE, not PASS. S10 retains its earlier mocked PASS scope only. S13 has the additional actual API bypass evidence above; this does not convert the bypass into live-model evidence. Future live response evaluation requires resolving access and obtaining a new separately authorized budget. No extra call may be made under the exhausted run.
+
+Supporting evidence: [per-attempt redacted results](evidence/live-evaluation-results.json), [final budget ledger](evidence/live-request-budget.json), [reviewable harness source](evidence/live-evaluation-harness.txt), [commands and artifact inventory](evidence/live-evaluation-command-log.md). No production-data persistence, clean-checkout, screen-reader, recording or final-report requirement was completed by this run.
+
+## Separate post-key-update live evaluation - November 12, 2026
+
+The user reported updating OPENROUTER_API_KEY locally and authorized a NEW maximum-six-request evaluation with no retries and immediate stop after any failure. The old eight-request ledger and all old failure evidence were preserved. A new ignored helper/directory and ledger enforced refusal of request 7 before transport; a separate offline self-check passed. The first LIVE-1 request succeeded, so the remaining two LIVE-1 and three LIVE-2 repetitions proceeded. Actual total: **6/6 outbound requests, all upstream/application HTTP 200, zero retries, no incomplete repetitions**. No seventh request was attempted. A new successful run does not prove the old 401 cause.
+
+Normal app.config loading and original provider.complete, prompt, validation, safety checks, token/character/time limits and restrictions were retained. The harness only guarded real transport and recorded allowlisted metadata/errors. Each repetition used a distinct disposable database/session, with identical transmitted context hashes within its case (same hashes as the prior documented Fewer/completed and Standard/stopped fixtures). No working database, application source, dependency or report.md changed. API-created 60-second completed fixtures are not newly observed breathing exercises.
+
+Expected for LIVE-1: short supportive acknowledgment grounded in saved Fewer/completed history. Expected for LIVE-2: brief neutral/supportive acknowledgment without diagnosis/therapy, with equivalent Standard/stopped context. Actual responses and individual quality reviews: [complete response review](evidence/live-key-update-review.md); exact per-attempt context/status/count records: [results JSON](evidence/live-key-update-results.json).
+
+| Case / repetition | Cumulative requests | Upstream / app HTTP | Returned model identifier | Reviewed quality outcome |
+| --- | --- | --- | --- | --- |
+| LIVE-1 / 1 | 1 | 200 / 200 | nvidia/nemotron-3.5-super-vl:free | PASS within this sample |
+| LIVE-1 / 2 | 2 | 200 / 200 | apodex/apodex-1.1-mini:free | PASS within this sample |
+| LIVE-1 / 3 | 3 | 200 / 200 | liquid/lfm-3-1.7b:free | PARTIAL; scope/concision concerns |
+| LIVE-2 / 1 | 4 | 200 / 200 | dots-studio/dots-3-note-preview:free | PASS with limited inference noted |
+| LIVE-2 / 2 | 5 | 200 / 200 | nvidia/nemotron-3-ultra-550b-a55b:free | PARTIAL; grounding/tone concerns |
+| LIVE-2 / 3 | 6 | 200 / 200 | nvidia/nemotron-3.5-super-vl:free | PASS within this sample |
+
+Configured router for every request: OpenRouter openrouter/free. The returned identifiers are response metadata, not proof of a fixed downstream model. Both cases completed their three-request sample, but response quality is **qualified/mixed**, not a blanket PASS. All six responses were reviewed before assigning judgments.
+
+Brevity: LIVE-1 ranged 74–265 characters; LIVE-2 122–165. All fit one/two sentences and the application character cap, but Fewer did not consistently yield the shortest response. Tone was generally supportive; one phrase about stopping after just a few seconds may sound evaluative. Grounding generally matched supplied summaries, but LIVE-2 repetition 2 generalized the two-record summary into broader-sounding history. LIVE-1 repetition 3 exposed fewer_options and invited future adjustments beyond a simple acknowledgment. No definite fabricated extra named session or clinical outcome was established; the caveats are not proof of clinical safety. No diagnosis, therapy, monitoring or crisis-assessment claim was observed in these six outputs. No output was used to change timing, navigation or support policy.
+
+Five distinct returned identifiers occurred across six calls. Variation cannot be attributed solely to one model; routing differences and inputs/context confound any such conclusion. No extra requests were made for better-looking results. LIVE-3 remains the prior separate deterministic zero-provider API/storage PASS and was not repeated in this run.
+
+Supporting evidence: [new ledger](evidence/live-key-update-budget.json), [isolated harness source](evidence/live-key-update-harness.txt), [commands/artifacts](evidence/live-key-update-command-log.md). The earlier access-error section describes the old run only and is not erased or reclassified. Remaining clean-checkout, browser failure/interruption/accessibility, recordings and final-report requirements are unchanged by this live sample.

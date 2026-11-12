@@ -1,0 +1,300 @@
+{
+  "baseline": "28fe92dbcf0c22ce73cce73629a5264a63a08410",
+  "provider": "OpenRouter",
+  "configured_router": "openrouter/free",
+  "run": "Separate evaluation after user-reported local key update",
+  "budget_maximum": 6,
+  "retry_maximum": 0,
+  "method": "Unchanged FastAPI routes via TestClient, original live provider function and guarded original transport; stop after any failure.",
+  "fixture_note": "Validated fictional API-created completed/stopped fixtures; no new browser timing observation.",
+  "attempts": [
+    {
+      "case": "LIVE-1",
+      "repetition": 1,
+      "retry": false,
+      "fictional_session_id": "9f737257-1cfd-4c7e-97b1-81014f01fe08",
+      "input": "The shorter instructions were easier to follow.",
+      "expected": "Brief neutral/supportive acknowledgment grounded only in supplied fictional context; no diagnosis, therapy or invented history.",
+      "configured_router": "openrouter/free",
+      "outbound": [
+        {
+          "cumulative_request": 1,
+          "configured_router": "openrouter/free",
+          "context": {
+            "selected_skill": "paced_breathing_4_6",
+            "status": "completed",
+            "measured_duration_seconds": 60.0,
+            "fewer_options": true,
+            "reflection": "The shorter instructions were easier to follow.",
+            "guidance_mode": "fewer",
+            "recent_sessions": [
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "completed",
+                "measured_duration_seconds": 60.0
+              },
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "completed",
+                "measured_duration_seconds": 60.0
+              }
+            ]
+          },
+          "context_sha256": "0e9184f3c7c848334da8cb9bf4d024ab3cc57499d6a12a81530a117d6e5d0a1d",
+          "http_status": 200,
+          "returned_model": "nvidia/nemotron-3.5-super-vl:free",
+          "finish_reason": "stop"
+        }
+      ],
+      "started_at": "2026-11-12T19:33:12.076140+00:00",
+      "application_http_status": 200,
+      "assistant_response": "Thank you for sharing that the shorter instructions were easier to follow.",
+      "execution_outcome": "SUCCESS; quality review separate",
+      "requests_this_attempt": 1,
+      "cumulative_outbound_requests": 1,
+      "completed_at": "2026-11-12T19:33:22.357189+00:00"
+    },
+    {
+      "case": "LIVE-1",
+      "repetition": 2,
+      "retry": false,
+      "fictional_session_id": "e495ab35-64d7-40bf-8c5c-59285ef3a2cf",
+      "input": "The shorter instructions were easier to follow.",
+      "expected": "Brief neutral/supportive acknowledgment grounded only in supplied fictional context; no diagnosis, therapy or invented history.",
+      "configured_router": "openrouter/free",
+      "outbound": [
+        {
+          "cumulative_request": 2,
+          "configured_router": "openrouter/free",
+          "context": {
+            "selected_skill": "paced_breathing_4_6",
+            "status": "completed",
+            "measured_duration_seconds": 60.0,
+            "fewer_options": true,
+            "reflection": "The shorter instructions were easier to follow.",
+            "guidance_mode": "fewer",
+            "recent_sessions": [
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "completed",
+                "measured_duration_seconds": 60.0
+              },
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "completed",
+                "measured_duration_seconds": 60.0
+              }
+            ]
+          },
+          "context_sha256": "0e9184f3c7c848334da8cb9bf4d024ab3cc57499d6a12a81530a117d6e5d0a1d",
+          "http_status": 200,
+          "returned_model": "apodex/apodex-1.1-mini:free",
+          "finish_reason": "stop"
+        }
+      ],
+      "started_at": "2026-11-12T19:33:22.395549+00:00",
+      "application_http_status": 200,
+      "assistant_response": "Thank you for completing the session and sharing your feedback. It is good to hear the shorter instructions were easier to follow.",
+      "execution_outcome": "SUCCESS; quality review separate",
+      "requests_this_attempt": 1,
+      "cumulative_outbound_requests": 2,
+      "completed_at": "2026-11-12T19:33:31.210071+00:00"
+    },
+    {
+      "case": "LIVE-1",
+      "repetition": 3,
+      "retry": false,
+      "fictional_session_id": "a7f744b0-2627-48d5-ba4a-078b6d2db9c7",
+      "input": "The shorter instructions were easier to follow.",
+      "expected": "Brief neutral/supportive acknowledgment grounded only in supplied fictional context; no diagnosis, therapy or invented history.",
+      "configured_router": "openrouter/free",
+      "outbound": [
+        {
+          "cumulative_request": 3,
+          "configured_router": "openrouter/free",
+          "context": {
+            "selected_skill": "paced_breathing_4_6",
+            "status": "completed",
+            "measured_duration_seconds": 60.0,
+            "fewer_options": true,
+            "reflection": "The shorter instructions were easier to follow.",
+            "guidance_mode": "fewer",
+            "recent_sessions": [
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "completed",
+                "measured_duration_seconds": 60.0
+              },
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "completed",
+                "measured_duration_seconds": 60.0
+              }
+            ]
+          },
+          "context_sha256": "0e9184f3c7c848334da8cb9bf4d024ab3cc57499d6a12a81530a117d6e5d0a1d",
+          "http_status": 200,
+          "returned_model": "liquid/lfm-3-1.7b:free",
+          "finish_reason": "stop"
+        }
+      ],
+      "started_at": "2026-11-12T19:33:31.247792+00:00",
+      "application_http_status": 200,
+      "assistant_response": "Your note that the shorter instructions in “fewer_options” mode were easier to follow during the paced‑breathing exercise is recorded—60 seconds per session—so I’m glad you found them helpful. Feel free to let me know if you’d like to try any adjustments next time.",
+      "execution_outcome": "SUCCESS; quality review separate",
+      "requests_this_attempt": 1,
+      "cumulative_outbound_requests": 3,
+      "completed_at": "2026-11-12T19:33:33.109855+00:00"
+    },
+    {
+      "case": "LIVE-2",
+      "repetition": 1,
+      "retry": false,
+      "fictional_session_id": "ec0ed404-b1a9-465c-a050-c25d9e4175b3",
+      "input": "The exercise was simple to understand.",
+      "expected": "Brief neutral/supportive acknowledgment grounded only in supplied fictional context; no diagnosis, therapy or invented history.",
+      "configured_router": "openrouter/free",
+      "outbound": [
+        {
+          "cumulative_request": 4,
+          "configured_router": "openrouter/free",
+          "context": {
+            "selected_skill": "paced_breathing_4_6",
+            "status": "stopped",
+            "measured_duration_seconds": 5.0,
+            "fewer_options": false,
+            "reflection": "The exercise was simple to understand.",
+            "guidance_mode": "standard",
+            "recent_sessions": [
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "stopped",
+                "measured_duration_seconds": 5.0
+              },
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "stopped",
+                "measured_duration_seconds": 5.0
+              }
+            ]
+          },
+          "context_sha256": "c1200c97c27c1f0d07dd60d361a57817881cd182b11a99a5f8234e5dfd4a1d25",
+          "http_status": 200,
+          "returned_model": "dots-studio/dots-3-note-preview:free",
+          "finish_reason": "stop"
+        }
+      ],
+      "started_at": "2026-11-12T19:33:33.148445+00:00",
+      "application_http_status": 200,
+      "assistant_response": "It's helpful to hear that the paced breathing exercise felt simple and easy to understand. Finding the instructions clear can make the practice feel more accessible.",
+      "execution_outcome": "SUCCESS; quality review separate",
+      "requests_this_attempt": 1,
+      "cumulative_outbound_requests": 4,
+      "completed_at": "2026-11-12T19:33:39.561081+00:00"
+    },
+    {
+      "case": "LIVE-2",
+      "repetition": 2,
+      "retry": false,
+      "fictional_session_id": "e975cf64-e2ad-4ed4-8fe8-73d1a63efa5a",
+      "input": "The exercise was simple to understand.",
+      "expected": "Brief neutral/supportive acknowledgment grounded only in supplied fictional context; no diagnosis, therapy or invented history.",
+      "configured_router": "openrouter/free",
+      "outbound": [
+        {
+          "cumulative_request": 5,
+          "configured_router": "openrouter/free",
+          "context": {
+            "selected_skill": "paced_breathing_4_6",
+            "status": "stopped",
+            "measured_duration_seconds": 5.0,
+            "fewer_options": false,
+            "reflection": "The exercise was simple to understand.",
+            "guidance_mode": "standard",
+            "recent_sessions": [
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "stopped",
+                "measured_duration_seconds": 5.0
+              },
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "stopped",
+                "measured_duration_seconds": 5.0
+              }
+            ]
+          },
+          "context_sha256": "c1200c97c27c1f0d07dd60d361a57817881cd182b11a99a5f8234e5dfd4a1d25",
+          "http_status": 200,
+          "returned_model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "finish_reason": "stop"
+        }
+      ],
+      "started_at": "2026-11-12T19:33:39.598579+00:00",
+      "application_http_status": 200,
+      "assistant_response": "It sounds like the instructions were clear for you. You’ve tried this exercise a few times now, each time stopping after just a few seconds.",
+      "execution_outcome": "SUCCESS; quality review separate",
+      "requests_this_attempt": 1,
+      "cumulative_outbound_requests": 5,
+      "completed_at": "2026-11-12T19:33:48.018986+00:00"
+    },
+    {
+      "case": "LIVE-2",
+      "repetition": 3,
+      "retry": false,
+      "fictional_session_id": "624c3443-d1e1-41af-95a3-a2655a45194f",
+      "input": "The exercise was simple to understand.",
+      "expected": "Brief neutral/supportive acknowledgment grounded only in supplied fictional context; no diagnosis, therapy or invented history.",
+      "configured_router": "openrouter/free",
+      "outbound": [
+        {
+          "cumulative_request": 6,
+          "configured_router": "openrouter/free",
+          "context": {
+            "selected_skill": "paced_breathing_4_6",
+            "status": "stopped",
+            "measured_duration_seconds": 5.0,
+            "fewer_options": false,
+            "reflection": "The exercise was simple to understand.",
+            "guidance_mode": "standard",
+            "recent_sessions": [
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "stopped",
+                "measured_duration_seconds": 5.0
+              },
+              {
+                "skill": "paced_breathing_4_6",
+                "status": "stopped",
+                "measured_duration_seconds": 5.0
+              }
+            ]
+          },
+          "context_sha256": "c1200c97c27c1f0d07dd60d361a57817881cd182b11a99a5f8234e5dfd4a1d25",
+          "http_status": 200,
+          "returned_model": "nvidia/nemotron-3.5-super-vl:free",
+          "finish_reason": "stop"
+        }
+      ],
+      "started_at": "2026-11-12T19:33:48.055298+00:00",
+      "application_http_status": 200,
+      "assistant_response": "Thank you for sharing that reflection. It sounds like the paced breathing exercise was straightforward and easy to follow.",
+      "execution_outcome": "SUCCESS; quality review separate",
+      "requests_this_attempt": 1,
+      "cumulative_outbound_requests": 6,
+      "completed_at": "2026-11-12T19:33:49.588805+00:00"
+    }
+  ],
+  "total_outbound_requests": 6,
+  "additional_retries_used": 0,
+  "stopped_after_failure": false,
+  "guard_self_check": {
+    "network_used": false,
+    "six_claims_allowed": true,
+    "seventh_claim_refused": true
+  },
+  "incomplete_repetitions": [],
+  "LIVE-3": {
+    "status": "Separate deterministic zero-provider check passed in previous run; not repeated or counted as model output here."
+  }
+}
