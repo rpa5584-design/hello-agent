@@ -1,0 +1,59 @@
+{
+  "Profile": {
+    "query": "SELECT profile_id,display_name,guidance_mode,updated_at FROM local_profile",
+    "columns": [
+      "profile_id",
+      "display_name",
+      "guidance_mode",
+      "updated_at"
+    ],
+    "rows": [
+      [
+        1,
+        "Sam",
+        "fewer",
+        "2026-11-12T19:01:22.939230+00:00"
+      ]
+    ]
+  },
+  "Sessions": {
+    "query": "SELECT session_id,status,measured_duration_seconds,fewer_options FROM sessions ORDER BY started_at,session_id",
+    "columns": [
+      "session_id",
+      "status",
+      "measured_duration_seconds",
+      "fewer_options"
+    ],
+    "rows": [
+      [
+        "a2b1f167-d369-4805-b580-3d6528487e83",
+        "stopped",
+        3.797,
+        1
+      ]
+    ]
+  },
+  "Conversation messages": {
+    "query": "SELECT message_id,session_id,role,content FROM conversation_messages ORDER BY message_id",
+    "columns": [
+      "message_id",
+      "session_id",
+      "role",
+      "content"
+    ],
+    "rows": [
+      [
+        1,
+        "a2b1f167-d369-4805-b580-3d6528487e83",
+        "user",
+        "A fictional pause."
+      ],
+      [
+        2,
+        "a2b1f167-d369-4805-b580-3d6528487e83",
+        "assistant",
+        "A brief fictional acknowledgment."
+      ]
+    ]
+  }
+}

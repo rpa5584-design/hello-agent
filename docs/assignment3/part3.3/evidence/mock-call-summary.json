@@ -1,0 +1,19 @@
+{
+  "source": "isolated verification runtime replacement of reflection_provider.complete",
+  "live_provider_calls": 0,
+  "mock_calls": [
+    {
+      "mock": true,
+      "failure": false,
+      "guidance_mode": "fewer",
+      "recent_count": 1
+    },
+    {
+      "mock": true,
+      "failure": true,
+      "guidance_mode": "fewer",
+      "recent_count": 2
+    }
+  ],
+  "note": "One success submission, then history GETs and backend restart without another mock call; one later explicit failure submission."
+}
