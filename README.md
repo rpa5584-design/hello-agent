@@ -146,3 +146,103 @@ These lint commands avoid source changes; npm run lint auto-fixes. Run git diff 
 ## Revised Part 2 submission evidence
 
 See [final Part 2 report](report.md), [RAG schema/context and observed SQL](docs/rag-context.md), [labeled fixed JSON sample](docs/rag-fixed-sample.json), and [verification log](docs/verification.md). User-reported completed manual checks include populated/no-match/two-night answers, direct DB comparison, RAG details, Ctrl+R ID restoration and restart/trace persistence; saved traces and dated DB values were also inspected read-only. Keyboard/narrow chatbot review remains pending. Report placeholders are `FINAL_COMMIT_PENDING` and `DEMO_VIDEO_LINK_PENDING`; no final assessed RAG commit or Part 2 demo link is asserted yet.
+
+## Assignment 4.1: isolated backend foundation
+
+Use only the sibling worktree C:\Users\alana\Desktop\RoomTour-Assignment4, branch assignment4_part1. Earlier applications and their launch targets remain intact. This stage implements persistence/replay with fictional fixtures; Yahoo streaming, browser WebSockets, charts and the live-feed demo are not implemented.
+
+From that worktree root in PowerShell:
+
+```powershell
+py -3.13 -m venv backend/.venv
+.\backend\.venv\Scripts\python.exe -m pip install --cache-dir backend/.pip-cache -r backend/requirements-assignment4.txt
+.\backend\.venv\Scripts\python.exe -m pip check
+cd backend
+.\.venv\Scripts\python.exe -m pytest -p no:cacheprovider tests/test_assignment4_foundation.py -q
+```
+
+The environment was initially installed from existing requirements.txt, resolving FastAPI 0.162.7 and pytest 9.2.0; requirements-assignment4.txt now pins those direct requirements. Exact resolved versions and compatibility limits: [environment](docs/assignment4/part4.1/resolved-dependencies.txt), [sources](docs/assignment4/part4.1/sources.md). yfinance 1.8.0 and lightweight-charts 5.3.0 were confirmed available but deferred because unused.
+
+For a later manual backend launch from backend/:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn app.main:create_assignment4_app --factory --host 127.0.0.1 --port 8001
+```
+
+Check port ownership; never stop unrelated processes. Startup explicitly initializes only backend/data/assignment4.sqlite3. It creates empty tables on first initialization, reuses supported existing data, and rejects incompatible files/policy without reset or seed. No new environment variable, credential, Yahoo/model request or original environment is needed. The default working DB was not launched or opened in foundation verification; tests inject disposable paths.
+
+GET /api/assignment4/health reports foundation/not_implemented feed status. Read-only /candles, /receipts?after=0&limit=100 and /replay?through=N expose stored state and replay; no public ingestion endpoint. MarketService.record is the internal typed-provenance fixture boundary. Source/receipt times, app quote-slot IDs/revisions and application candle completion persist transactionally. Volume remains null/unknown; cumulative counters are preserved without summing.
+
+Observed verification: 43 focused tests passed; full backend suite reported 436 passed plus the previously documented hotel_assistant_prompt teardown error (exit 1), left unchanged. Automated app-instance and fresh-process storage persistence passed; real browser refresh and owned Uvicorn restart remain unverified. No frontend implementation, live evidence or recording exists yet. See [verification](docs/assignment4/part4.1/verification.md), [evidence](docs/assignment4/part4.1/evidence-log.md), [schema](docs/assignment4/part4.1/schema.md) and [next-stage plan](docs/assignment4/part4.1/design.md). Root report.md remains Assignment 3; the Assignment 4 draft is [separate](docs/assignment4/part4.1/report-draft.md).
+
+## Assignment 4.1 source-validation checkpoint
+
+Supersedes the foundation-only source status above. yfinance==1.8.0 is now installed in THIS worktree and declared in requirements-assignment4.txt. Chart package remains deferred. No Yahoo connection starts from the FastAPI app.
+
+The authorized 60.041s capture received six BTC-USD/ETH-USD messages with zero reconnects. One BTC history call used two chart requests (timezone + 1m). The investigation budget is exhausted; do not rerun without fresh authorization. See [actual source validation](docs/assignment4/part4.1/source-validation.md) and [latest environment](docs/assignment4/part4.1/resolved-dependencies-stream.txt).
+
+Observed time is millisecond-unit strings with whole-second precision; receipt lag 5.7-10.7s. Stream volume remains null. Retrieved bar values have separate provenance and unverified units/coverage; no historical volume is spliced into streamed candles.
+
+Schema v2 preserves different same-time Yahoo payloads as separate app observations. Fixture-only replacement revisions remain synthetic tests. v1 fixture-only data migrates additively; legacy Yahoo receipts require explicit review. No working DB was opened/migrated. Relevant tests: 70 passed; pip check passed. Full dashboard awaits a separate intraday OHLCV storage/quality contract. No frontend, automatic live ingestion, commit or video.
+
+
+## Assignment 4.1 integrated dashboard (current checkpoint)
+
+This section supersedes earlier Assignment 4 checkpoint status. Work only in `C:/Users/alana/Desktop/RoomTour-Assignment4`, branch `assignment4_part1`. The independent Vue/FastAPI/SQLite dashboard now has actual Yahoo stream ingestion, persisted WebSocket updates, two clearly separated chart products and receipt-order replay. Read the [data contract and requirement coverage](docs/assignment4/part4.1/dashboard-contract.md) and [observed verification](docs/assignment4/part4.1/dashboard-verification.md).
+
+From this worktree root, reuse its own backend/.venv; for a clean setup:
+
+```powershell
+py -3.13 -m venv backend/.venv
+.\backend\.venv\Scripts\python.exe -m pip install --cache-dir backend/.pip-cache -r backend/requirements-assignment4.txt
+.\backend\.venv\Scripts\python.exe -m pip check
+npm ci --prefix frontend --cache .npm-cache
+```
+
+Check port ownership first. In separate owned terminals:
+
+```powershell
+# From backend/
+.\.venv\Scripts\python.exe -m uvicorn app.main:create_assignment4_app --factory --host 127.0.0.1 --port 8001
+# From frontend/
+npm run dev -- --host 127.0.0.1 --port 5174 --strictPort
+```
+
+Open http://127.0.0.1:5174/assignment4.html . Vite proxies Assignment 4 HTTP/WebSocket traffic to 8001; earlier applications keep their entries and proxy. Startup initializes/reuses ONLY backend/data/assignment4.sqlite3; no source connection starts automatically. Injectable factory database paths support disposable tests. Never reset an existing database or copy earlier working databases.
+
+Start/Stop live is explicit. Stream candles use only received prices and always show unknown volume. The separate Yahoo interval mode pairs OHLC and volume from the same raw 1m record; Start live now refreshes the selected instrument immediately then60s after each completed request, with bounded60/120s failure backoff and the same durable three-fetch allowance shared with its manual button. Stop/expiry ends refresh work; no overlap or automatic startup polling. Provider-reported crypto volume units/completeness are unverified. Replay is clearly labelled, uses saved event cutoffs and never starts a provider. Completion/revisions are application rules, not exchange guarantees.
+
+The development allowance is persisted: at most two instruments, 180 reserved seconds including cleanup, two connection attempts and three explicit history calls. This verification consumed all THREE history fetches, one attempt and 93 reserved seconds (90.178s managed runtime). Do not reset the budget or initiate further upstream work after this review checkpoint without authorization. Existing stored data/replay remains available. No credentials or new environment variables are needed.
+
+Direct pins: yfinance 1.8.0, FastAPI 0.162.7, pytest 9.2.0; chart dependency lightweight-charts 5.3.0 (fancy-canvas 2.1.0). Python 3.13.7 and Node 24.20.0 were observed compatible in these checks. The earlier eight npm findings were triaged and resolved through compatible lockfile updates (ESLint10.15.0, Vite8.3.8 and allowed dependencies). Full/production audit now reports zero known vulnerabilities; see docs/assignment4/part4.1/npm-triage.md. Manifest version ranges were not changed. Chart attribution/logo and publisher notices are retained.
+
+Verification: 100 relevant backend tests, 123 frontend tests, non-fixing Oxlint/ESLint, production build and pip check passed. Actual browser refresh AND owned-backend restart retained records, projections, price and budget, with no source auto-restart. The older full-backend hotel_assistant_prompt teardown issue was not fixed or rerun. Full keyboard/wide-layout review and submission video remain pending. No claim of fully streamed OHLCV or final submission readiness. Root report.md is unchanged; use the [separate draft](docs/assignment4/part4.1/report-draft.md).
+
+## Assignment 4.1 bounded-refresh review
+
+Current implementation/limits: [interval refresh](docs/assignment4/part4.1/interval-refresh.md), [verification](docs/assignment4/part4.1/refresh-verification.md), [submission readiness and video shot list](docs/assignment4/part4.1/submission-readiness.md). This stage made ZERO Yahoo/model calls and did not reset/open the working database. The previous exhausted allowance remains exhausted. Automatic scheduling is verified offline; actual automatic-polled OHLCV updates in a fresh live/browser run remain unobserved. Do not claim manual bars or this offline test establish live corresponding-volume updates or instructor approval. Earlier test counts/checkpoint observations above are historical; current totals are in refresh-verification.md. No final report overwrite, commit or push.
+
+## Assignment 4.1 reproducible isolated / offline launch
+
+Run these commands only in the Assignment4 checkout. Create its own environment with the setup commands above. Python commands below run from backend/ (running app.* modules from repository root fails import resolution).
+
+```powershell
+# New isolated live-verification DB; no connection occurs until Start live.
+.\.venv\Scripts\python.exe -m app.assignment4.run_dashboard --database data/verification-live-20261114.sqlite3 --no-reconnect
+# OR: no-network recorded-data demonstration in a DIFFERENT new DB.
+.\.venv\Scripts\python.exe -m app.assignment4.run_dashboard --database data/offline-demo.sqlite3 --offline --recording ../docs/assignment4/part4.1/evidence/live-refresh-recording.json
+```
+
+The recording is decoded public Yahoo evidence from the bounded verification, with original source/receipt/retrieval times; it is NOT a fixture or a current feed. Import requires a new empty DB and refuses to overwrite existing events. On subsequent offline restarts, omit --recording and reuse --database data/offline-demo.sqlite3 --offline. No cookie, credential or working database is needed. Offline mode blocks source controls at backend and UI; its banner says recorded data/upstream disabled. Select Replay saved receipts, then Play or move the cursor to inspect stored data; Live view in offline mode is still labelled recorded/offline. Simulate unavailable is explicitly a simulation and preserves the records. Stream-candle volume remains unknown; separate interval mode shows matching provider records.
+
+Frontend in a second terminal from frontend/: `npm run dev -- --host 127.0.0.1 --port 5174 --strictPort`. Open http://127.0.0.1:5174/assignment4.html . Stop only owned terminals with Ctrl+C. Never run the live launcher as part of a zero-network clean-checkout check.
+
+For offline focused tests from backend/, run all tests/test_assignment4_*.py plus tests/test_assignment3_structure.py using pytest -p no:cacheprovider. Frontend: node --test tests/*.test.js; non-fixing Oxlint/ESLint commands above; npm run build. No model/Yahoo calls are made by these tests. --no-reconnect limits the dashboard to one saved connection attempt for the disposable live verification, even after a failure; ordinary durable budgets are not reset.
+
+Exact Windows PowerShell focused backend command (from backend/; Python does not expand a quoted *.py path):
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -p no:cacheprovider tests/test_assignment4_launcher.py tests/test_assignment4_refresh.py tests/test_assignment4_dashboard.py tests/test_assignment4_foundation.py tests/test_assignment4_source_policy.py tests/test_assignment4_stream.py tests/test_assignment3_structure.py -q
+```
+
+Actual automatic-refresh evidence is now in [live verification](docs/assignment4/part4.1/live-refresh-verification.md): one83.259s BTC session,12 stream receipts,two automatic interval fetches. Both fetches returned unchanged valid OHLCV; no changing volume bar is claimed. Earlier manual-only evidence statuses above are historical.

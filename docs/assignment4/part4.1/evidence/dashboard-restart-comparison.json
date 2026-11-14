@@ -1,0 +1,15 @@
+{
+  "checks": {
+    "stream_cutoff": true,
+    "bar_cutoff": true,
+    "interval_bars_equal": true,
+    "stream_candles_equal": true,
+    "usage_preserved": true,
+    "BTC_price": true,
+    "BTC_receipt_identity": true,
+    "no_automatic_source_restart": true
+  },
+  "before_cursor": 25,
+  "after_cursor": 26,
+  "limits": "Control lifecycle cursor advances; immutable data and budgets do not reset."
+}

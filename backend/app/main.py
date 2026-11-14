@@ -1,5 +1,6 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 
@@ -53,3 +54,10 @@ async def health_check() -> dict[str, str | bool]:
             else "key is not configured"
         ),
     }
+
+
+def create_assignment4_app(database_path: Path | None = None) -> FastAPI:
+    """Independent market foundation; no RoomTour/Assignment 3 lifespan."""
+    from app.assignment4 import create_app
+
+    return create_app(database_path)

@@ -1,0 +1,117 @@
+- banner:
+  - link "MARKET OBSERVATORY":
+    - /url: /assignment4.html
+    - generic: ◉
+    - text: MARKET OBSERVATORY
+- main:
+  - paragraph: A CLEAR VIEW OF THE SOURCE
+  - heading "Watch the market. Keep the context." [level=1]:
+    - text: Watch the market.
+    - emphasis: Keep the context.
+  - paragraph:
+    - text: Streaming price observations and reported interval bars.
+    - text: Two products, with their differences kept visible.
+  - text: VIEWING MODE
+  - generic "Live or replay":
+    - button "Live"
+    - button "Replay saved receipts"
+  - paragraph: Live view · collecting only after Start live
+  - text: "Browser socket:"
+  - strong: connected
+  - region "Market data workspace":
+    - complementary:
+      - generic: STREAM OBSERVATION
+      - generic: stopped
+      - generic "Instrument":
+        - button "BTC-USD"
+        - button "ETH-USD"
+      - paragraph: Bitcoin / US dollar
+      - generic: $67,620.39
+      - paragraph: Last received stream price · USD
+      - term: Source
+      - definition: Yahoo Finance stream
+      - term: Interval
+      - definition: 1 minute, UTC
+      - term: Source-data age
+      - definition: 766.1s
+      - term: Receipt age
+      - definition: 759.1s
+      - term: Source time
+      - definition: 2026-11-14 03:10:16 UTC
+      - term: Receipt time
+      - definition: 2026-11-14 03:10:23.007Z
+      - button "Start live · 90s" [disabled]
+      - button "Stop live"
+      - paragraph: No automatic connection. Up to two instruments, 180 seconds reserved including cleanup, and one reconnect per saved development budget.
+      - text: Stream time
+      - generic: 90.2s
+      - text: Reserved
+      - generic: 93 / 180s
+      - text: Reconnects
+      - generic: 0 / 1
+      - text: History fetches
+      - generic: 3 / 3
+      - text: History HTTP calls
+      - generic: "6"
+    - region "Price and volume chart":
+      - text: THE DATA PRODUCT
+      - heading "Yahoo interval OHLCV · 1 minute" [level=2]
+      - generic: 1m / UTC
+      - button "Yahoo interval OHLCV"
+      - button "Stream-observed candles"
+      - button "Fetch BTC-USD intervals" [disabled]
+      - paragraph: "Polled snapshot: matching OHLC and volume from each Yahoo interval record. Volume units are provider-reported and unverified."
+      - figure "Yahoo interval candlesticks with matching provider-reported volume":
+        - table:
+          - row:
+            - cell
+            - cell
+            - cell
+          - row:
+            - cell
+          - row "Charting by TradingView":
+            - cell
+            - cell "Charting by TradingView":
+              - link "Charting by TradingView":
+                - /url: https://www.tradingview.com/?utm_medium=lwc-link&utm_campaign=lwc-chart&utm_source=127.0.0.1/assignment4.html&utm_content=lwc-5.3.0
+            - cell
+          - row:
+            - cell
+            - cell
+            - cell
+        - button "Fit chart"
+      - text: Bars in view
+      - strong: "190"
+      - text: Retrieval age
+      - strong: 758.9s
+      - text: Interval state
+      - strong: interval_elapsed_by_app
+      - text: Corrections
+      - strong: None recorded for latest
+      - generic "Latest chart record":
+        - generic: 2026-11-14 03:09:00 UTC
+        - generic: O $67,563.05
+        - generic: H $67,616.09
+        - generic: L $67,560.73
+        - generic: C $67,576.37
+        - generic: Volume 0
+      - paragraph: Application interval closure is not exchange finality. Reported zero volume is kept as zero; missing volume is a gap. Historical volume is never attached to stream-derived OHLC.
+  - generic "Persisted receipt trail cursor 26":
+    - text: Persisted receipt trail
+    - generic: cursor 26
+  - generic "Interval quality review 6 quarantined":
+    - text: Interval quality review
+    - generic: 6 quarantined
+  - text: FAILURE BEHAVIOR
+  - paragraph: Keep saved data visible when the feed cannot update.
+  - button "Simulate unavailable feed"
+  - status: Start live explicitly; no automatic connection
+  - generic: Yahoo Finance via yfinance · educational, local demonstration · no trading or financial advice
+  - text: TradingView Lightweight Charts™ · Copyright (с) 2025 TradingView, Inc.
+  - link "TradingView":
+    - /url: https://www.tradingview.com/
+  - text: ·
+  - link "License & notices":
+    - /url: /assignment4-third-party-notices.txt
+- generic "Toggle devtools panel":
+- generic "Toggle Component Inspector":

@@ -1,0 +1,80 @@
+{
+  "counts": {
+    "receipts": 12,
+    "observations": 12,
+    "observation_versions": 12,
+    "interval_fetches": 2,
+    "interval_receipts": 638,
+    "interval_versions": 318,
+    "dashboard_events": 25
+  },
+  "fetches": [
+    {
+      "fetch_id": 1,
+      "symbol": "BTC-USD",
+      "provenance": "yahoo_interval",
+      "retrieved_at": "2026-11-14T05:18:01.751892+00:00",
+      "metadata_json": "{\"currency\":\"USD\",\"dataGranularity\":\"1m\",\"exchangeName\":\"CCC\",\"exchangeTimezoneName\":\"UTC\",\"instrumentType\":\"CRYPTOCURRENCY\",\"range\":\"1d\",\"symbol\":\"BTC-USD\"}"
+    },
+    {
+      "fetch_id": 2,
+      "symbol": "BTC-USD",
+      "provenance": "yahoo_interval",
+      "retrieved_at": "2026-11-14T05:19:02.166532+00:00",
+      "metadata_json": "{\"currency\":\"USD\",\"dataGranularity\":\"1m\",\"exchangeName\":\"CCC\",\"exchangeTimezoneName\":\"UTC\",\"instrumentType\":\"CRYPTOCURRENCY\",\"range\":\"1d\",\"symbol\":\"BTC-USD\"}"
+    }
+  ],
+  "classifications": [
+    {
+      "fetch_id": 1,
+      "kind": "new",
+      "count": 318
+    },
+    {
+      "fetch_id": 2,
+      "kind": "duplicate",
+      "count": 318
+    },
+    {
+      "fetch_id": 2,
+      "kind": "quarantined",
+      "count": 2
+    }
+  ],
+  "revisions": [],
+  "latest_versions": [
+    {
+      "version_id": 316,
+      "symbol": "BTC-USD",
+      "provenance": "yahoo_interval",
+      "source_time_s": 1794633300,
+      "revision_no": 1,
+      "receipt_seq": 316,
+      "supersedes_version_id": null,
+      "canonical_json": "{\"normalized\":{\"app_completion\":\"interval_elapsed_by_app\",\"close\":67151.171875,\"coverage\":\"returned interval snapshot; completeness unverified\",\"high\":67154.2421875,\"interval_s\":60,\"low\":67138.2578125,\"open\":67140.0234375,\"source\":\"Yahoo Finance interval OHLCV\",\"source_complete\":null,\"source_time_s\":1794633300,\"symbol\":\"BTC-USD\",\"volume\":5398528,\"volume_quality\":\"reported\",\"volume_units\":\"provider-reported; unverified\"},\"raw\":{\"close\":67151.171875,\"high\":67154.2421875,\"low\":67138.2578125,\"open\":67140.0234375,\"source_time_s\":1794633300,\"volume\":5398528}}",
+      "state_json": "{\"app_completion\":\"interval_elapsed_by_app\",\"close\":67151.171875,\"corrected\":false,\"coverage\":\"returned interval snapshot; completeness unverified\",\"fetch_id\":1,\"high\":67154.2421875,\"interval_s\":60,\"low\":67138.2578125,\"open\":67140.0234375,\"provenance\":\"yahoo_interval\",\"receipt_seq\":316,\"retrieved_at\":\"2026-11-14T05:18:01.751892+00:00\",\"revision_meaning\":\"retrieved-snapshot/app-completion change; not exchange correction\",\"revision_no\":1,\"source\":\"Yahoo Finance interval OHLCV\",\"source_complete\":null,\"source_time_s\":1794633300,\"symbol\":\"BTC-USD\",\"volume\":5398528,\"volume_quality\":\"reported\",\"volume_units\":\"provider-reported; unverified\"}"
+    },
+    {
+      "version_id": 317,
+      "symbol": "BTC-USD",
+      "provenance": "yahoo_interval",
+      "source_time_s": 1794633360,
+      "revision_no": 1,
+      "receipt_seq": 317,
+      "supersedes_version_id": null,
+      "canonical_json": "{\"normalized\":{\"app_completion\":\"interval_elapsed_by_app\",\"close\":67102.0,\"coverage\":\"returned interval snapshot; completeness unverified\",\"high\":67153.890625,\"interval_s\":60,\"low\":67102.0,\"open\":67153.2109375,\"source\":\"Yahoo Finance interval OHLCV\",\"source_complete\":null,\"source_time_s\":1794633360,\"symbol\":\"BTC-USD\",\"volume\":0,\"volume_quality\":\"reported_zero\",\"volume_units\":\"provider-reported; unverified\"},\"raw\":{\"close\":67102.0,\"high\":67153.890625,\"low\":67102.0,\"open\":67153.2109375,\"source_time_s\":1794633360,\"volume\":0}}",
+      "state_json": "{\"app_completion\":\"interval_elapsed_by_app\",\"close\":67102.0,\"corrected\":false,\"coverage\":\"returned interval snapshot; completeness unverified\",\"fetch_id\":1,\"high\":67153.890625,\"interval_s\":60,\"low\":67102.0,\"open\":67153.2109375,\"provenance\":\"yahoo_interval\",\"receipt_seq\":317,\"retrieved_at\":\"2026-11-14T05:18:01.751892+00:00\",\"revision_meaning\":\"retrieved-snapshot/app-completion change; not exchange correction\",\"revision_no\":1,\"source\":\"Yahoo Finance interval OHLCV\",\"source_complete\":null,\"source_time_s\":1794633360,\"symbol\":\"BTC-USD\",\"volume\":0,\"volume_quality\":\"reported_zero\",\"volume_units\":\"provider-reported; unverified\"}"
+    },
+    {
+      "version_id": 318,
+      "symbol": "BTC-USD",
+      "provenance": "yahoo_interval",
+      "source_time_s": 1794633420,
+      "revision_no": 1,
+      "receipt_seq": 318,
+      "supersedes_version_id": null,
+      "canonical_json": "{\"normalized\":{\"app_completion\":\"interval_elapsed_by_app\",\"close\":67138.7734375,\"coverage\":\"returned interval snapshot; completeness unverified\",\"high\":67138.7734375,\"interval_s\":60,\"low\":67111.6875,\"open\":67111.6875,\"source\":\"Yahoo Finance interval OHLCV\",\"source_complete\":null,\"source_time_s\":1794633420,\"symbol\":\"BTC-USD\",\"volume\":115228672,\"volume_quality\":\"reported\",\"volume_units\":\"provider-reported; unverified\"},\"raw\":{\"close\":67138.7734375,\"high\":67138.7734375,\"low\":67111.6875,\"open\":67111.6875,\"source_time_s\":1794633420,\"volume\":115228672}}",
+      "state_json": "{\"app_completion\":\"interval_elapsed_by_app\",\"close\":67138.7734375,\"corrected\":false,\"coverage\":\"returned interval snapshot; completeness unverified\",\"fetch_id\":1,\"high\":67138.7734375,\"interval_s\":60,\"low\":67111.6875,\"open\":67111.6875,\"provenance\":\"yahoo_interval\",\"receipt_seq\":318,\"retrieved_at\":\"2026-11-14T05:18:01.751892+00:00\",\"revision_meaning\":\"retrieved-snapshot/app-completion change; not exchange correction\",\"revision_no\":1,\"source\":\"Yahoo Finance interval OHLCV\",\"source_complete\":null,\"source_time_s\":1794633420,\"symbol\":\"BTC-USD\",\"volume\":115228672,\"volume_quality\":\"reported\",\"volume_units\":\"provider-reported; unverified\"}"
+    }
+  ]
+}

@@ -1,0 +1,406 @@
+{
+  "provenance": "actual_yahoo_intraday_history",
+  "symbol": "BTC-USD",
+  "history_calls": 1,
+  "requested_interval": "1m",
+  "requested_period": "1d",
+  "source": "Yahoo Finance via yfinance.Ticker.history",
+  "package_version": "1.8.0",
+  "chart_responses": [
+    {
+      "received_at": "2026-11-14T02:20:22.461405+00:00",
+      "metadata": {
+        "symbol": "BTC-USD",
+        "currency": "USD",
+        "instrumentType": "CRYPTOCURRENCY",
+        "exchangeName": "CCC",
+        "exchangeTimezoneName": "UTC",
+        "dataGranularity": "1d",
+        "range": "1d"
+      },
+      "raw_bar_count": 1,
+      "raw_bars_tail": [
+        {
+          "source_time_s": 1794622813,
+          "close": 68000.25,
+          "open": 68238.2109375,
+          "low": 68111.96875,
+          "high": 68360.7109375,
+          "volume": 41259986944
+        }
+      ]
+    },
+    {
+      "received_at": "2026-11-14T02:20:22.565899+00:00",
+      "metadata": {
+        "symbol": "BTC-USD",
+        "currency": "USD",
+        "instrumentType": "CRYPTOCURRENCY",
+        "exchangeName": "CCC",
+        "exchangeTimezoneName": "UTC",
+        "dataGranularity": "1m",
+        "range": "1d"
+      },
+      "raw_bar_count": 142,
+      "raw_bars_tail": [
+        {
+          "source_time_s": 1794621720,
+          "low": 68180.640625,
+          "close": 68233.2890625,
+          "high": 68233.2890625,
+          "open": 68191.5,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794621780,
+          "low": 68222.7734375,
+          "close": 68233.28125,
+          "high": 68237.890625,
+          "open": 68223.2421875,
+          "volume": 9207808
+        },
+        {
+          "source_time_s": 1794621840,
+          "low": 68213.6328125,
+          "close": 68236.15625,
+          "high": 68236.15625,
+          "open": 68229.4375,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794621900,
+          "low": 68185.34375,
+          "close": 68185.34375,
+          "high": 68232.6796875,
+          "open": 68232.6796875,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794621960,
+          "low": 68182.4921875,
+          "close": 68204.59375,
+          "high": 68208.7265625,
+          "open": 68182.4921875,
+          "volume": 6938624
+        },
+        {
+          "source_time_s": 1794622020,
+          "low": 68157.328125,
+          "close": 68157.328125,
+          "high": 68219.25,
+          "open": 68219.25,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622080,
+          "low": 68137.0390625,
+          "close": 68167.1328125,
+          "high": 68167.1328125,
+          "open": 68162.578125,
+          "volume": 26005504
+        },
+        {
+          "source_time_s": 1794622140,
+          "low": 68164.328125,
+          "close": 68180.546875,
+          "high": 68199.5,
+          "open": 68181.1328125,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622200,
+          "low": 68167.1328125,
+          "close": 68174.5625,
+          "high": 68199.59375,
+          "open": 68181.5,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622260,
+          "low": 68161.53125,
+          "close": 68161.53125,
+          "high": 68197.84375,
+          "open": 68174.5625,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622320,
+          "low": 68137.34375,
+          "close": 68139.84375,
+          "high": 68169.5,
+          "open": 68167.3203125,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622380,
+          "low": 68087.328125,
+          "close": 68114.75,
+          "high": 68138.3515625,
+          "open": 68137.03125,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622440,
+          "low": 68104.953125,
+          "close": 68112.109375,
+          "high": 68122.2890625,
+          "open": 68117.609375,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622500,
+          "low": 68112.1171875,
+          "close": 68159.078125,
+          "high": 68167.3203125,
+          "open": 68112.1171875,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622560,
+          "low": 68142.0078125,
+          "close": 68153.046875,
+          "high": 68166.6484375,
+          "open": 68155.2265625,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622620,
+          "low": 68079.46875,
+          "close": 68093.0234375,
+          "high": 68159.578125,
+          "open": 68159.578125,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622680,
+          "low": 68087.9765625,
+          "close": 68107.8984375,
+          "high": 68115.25,
+          "open": 68095.5234375,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622740,
+          "low": 68033.65625,
+          "close": 68033.65625,
+          "high": 68112.5078125,
+          "open": 68112.5078125,
+          "volume": 0
+        },
+        {
+          "source_time_s": 1794622800,
+          "low": null,
+          "close": null,
+          "high": null,
+          "open": null,
+          "volume": null
+        },
+        {
+          "source_time_s": 1794622813,
+          "low": 68000.25,
+          "close": 68000.25,
+          "high": 68000.25,
+          "open": 68000.25,
+          "volume": 0
+        }
+      ]
+    }
+  ],
+  "library_row_count": 141,
+  "library_rows_tail": [
+    {
+      "source_time": "2026-11-14T02:01:00+00:00",
+      "Open": 68246.203125,
+      "High": 68248.828125,
+      "Low": 68216.6875,
+      "Close": 68218.890625,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:02:00+00:00",
+      "Open": 68191.5,
+      "High": 68233.2890625,
+      "Low": 68180.640625,
+      "Close": 68233.2890625,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:03:00+00:00",
+      "Open": 68223.2421875,
+      "High": 68237.890625,
+      "Low": 68222.7734375,
+      "Close": 68233.28125,
+      "Volume": 9207808.0
+    },
+    {
+      "source_time": "2026-11-14T02:04:00+00:00",
+      "Open": 68229.4375,
+      "High": 68236.15625,
+      "Low": 68213.6328125,
+      "Close": 68236.15625,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:05:00+00:00",
+      "Open": 68232.6796875,
+      "High": 68232.6796875,
+      "Low": 68185.34375,
+      "Close": 68185.34375,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:06:00+00:00",
+      "Open": 68182.4921875,
+      "High": 68208.7265625,
+      "Low": 68182.4921875,
+      "Close": 68204.59375,
+      "Volume": 6938624.0
+    },
+    {
+      "source_time": "2026-11-14T02:07:00+00:00",
+      "Open": 68219.25,
+      "High": 68219.25,
+      "Low": 68157.328125,
+      "Close": 68157.328125,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:08:00+00:00",
+      "Open": 68162.578125,
+      "High": 68167.1328125,
+      "Low": 68137.0390625,
+      "Close": 68167.1328125,
+      "Volume": 26005504.0
+    },
+    {
+      "source_time": "2026-11-14T02:09:00+00:00",
+      "Open": 68181.1328125,
+      "High": 68199.5,
+      "Low": 68164.328125,
+      "Close": 68180.546875,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:10:00+00:00",
+      "Open": 68181.5,
+      "High": 68199.59375,
+      "Low": 68167.1328125,
+      "Close": 68174.5625,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:11:00+00:00",
+      "Open": 68174.5625,
+      "High": 68197.84375,
+      "Low": 68161.53125,
+      "Close": 68161.53125,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:12:00+00:00",
+      "Open": 68167.3203125,
+      "High": 68169.5,
+      "Low": 68137.34375,
+      "Close": 68139.84375,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:13:00+00:00",
+      "Open": 68137.03125,
+      "High": 68138.3515625,
+      "Low": 68087.328125,
+      "Close": 68114.75,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:14:00+00:00",
+      "Open": 68117.609375,
+      "High": 68122.2890625,
+      "Low": 68104.953125,
+      "Close": 68112.109375,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:15:00+00:00",
+      "Open": 68112.1171875,
+      "High": 68167.3203125,
+      "Low": 68112.1171875,
+      "Close": 68159.078125,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:16:00+00:00",
+      "Open": 68155.2265625,
+      "High": 68166.6484375,
+      "Low": 68142.0078125,
+      "Close": 68153.046875,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:17:00+00:00",
+      "Open": 68159.578125,
+      "High": 68159.578125,
+      "Low": 68079.46875,
+      "Close": 68093.0234375,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:18:00+00:00",
+      "Open": 68095.5234375,
+      "High": 68115.25,
+      "Low": 68087.9765625,
+      "Close": 68107.8984375,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:19:00+00:00",
+      "Open": 68112.5078125,
+      "High": 68112.5078125,
+      "Low": 68033.65625,
+      "Close": 68033.65625,
+      "Volume": 0.0
+    },
+    {
+      "source_time": "2026-11-14T02:20:00+00:00",
+      "Open": 68000.25,
+      "High": 68000.25,
+      "Low": 68000.25,
+      "Close": 68000.25,
+      "Volume": 0.0
+    }
+  ],
+  "status": "received",
+  "chart_requests": 2,
+  "http_calls": [
+    {
+      "host": "fc.yahoo.com",
+      "path": "",
+      "chart": false,
+      "started_at": "2026-11-14T02:20:21.567520+00:00",
+      "http_status": 404
+    },
+    {
+      "host": "query1.finance.yahoo.com",
+      "path": "/v1/test/getcrumb",
+      "chart": false,
+      "started_at": "2026-11-14T02:20:21.886463+00:00",
+      "http_status": 200
+    },
+    {
+      "host": "query2.finance.yahoo.com",
+      "path": "/v8/finance/chart/BTC-USD",
+      "chart": true,
+      "started_at": "2026-11-14T02:20:22.187054+00:00",
+      "http_status": 200
+    },
+    {
+      "host": "query2.finance.yahoo.com",
+      "path": "/v8/finance/chart/BTC-USD",
+      "chart": true,
+      "started_at": "2026-11-14T02:20:22.472478+00:00",
+      "http_status": 200
+    }
+  ],
+  "duration_seconds": 1.131108,
+  "ended_at": "2026-11-14T02:20:22.648300+00:00"
+}

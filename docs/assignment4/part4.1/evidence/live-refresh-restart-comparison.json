@@ -1,0 +1,9 @@
+{
+  "stream_cutoff": true,
+  "bar_cutoff": true,
+  "interval_bars": true,
+  "stream_candles": true,
+  "usage": true,
+  "price_same": true,
+  "no_auto_restart": true
+}

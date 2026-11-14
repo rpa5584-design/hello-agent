@@ -29,3 +29,9 @@ pytest-cache-files-*/
 .env
 .env.*
 !.env.example
+
+# Assignment 4 worktree-local pip cache
+/backend/.pip-cache/
+
+# Disposable clean-checkout verification stays local
+/.verification/

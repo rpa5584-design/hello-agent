@@ -1,0 +1,110 @@
+- banner:
+  - link "MARKET OBSERVATORY":
+    - /url: /assignment4.html
+    - generic: ◉
+    - text: MARKET OBSERVATORY
+- main:
+  - paragraph: A CLEAR VIEW OF THE SOURCE
+  - heading "Watch the market. Keep the context." [level=1]:
+    - text: Watch the market.
+    - emphasis: Keep the context.
+  - paragraph:
+    - text: Streaming price observations and reported interval bars.
+    - text: Two products, with their differences kept visible.
+  - text: VIEWING MODE
+  - generic "Live or replay":
+    - button "Live"
+    - button "Replay saved receipts"
+  - paragraph: Live view · collecting only after Start live
+  - text: "Browser socket:"
+  - strong: connected
+  - region "Market data workspace":
+    - complementary:
+      - generic: STREAM OBSERVATION
+      - generic: receiving
+      - generic "Instrument":
+        - button "BTC-USD"
+        - button "ETH-USD"
+      - paragraph: Bitcoin / US dollar
+      - generic: $67,605.73
+      - paragraph: Last received stream price · USD
+      - term: Source
+      - definition: Yahoo Finance stream
+      - term: Interval
+      - definition: 1 minute, UTC
+      - term: Source-data age
+      - definition: 9.8s
+      - term: Receipt age
+      - definition: 2.7s
+      - term: Source time
+      - definition: 2026-11-14 03:10:01 UTC
+      - term: Receipt time
+      - definition: 2026-11-14 03:10:08.076Z
+      - button "Start live · 90s" [disabled]
+      - button "Stop live"
+      - paragraph: No automatic connection. Up to two instruments, 180 seconds reserved including cleanup, and one reconnect per saved development budget.
+      - text: Stream time
+      - generic: 0.0s
+      - text: Reserved
+      - generic: 93 / 180s
+      - text: Reconnects
+      - generic: 0 / 1
+      - text: History fetches
+      - generic: 2 / 3
+      - text: Observed HTTP calls
+      - generic: "5"
+    - region "Price and volume chart":
+      - text: THE DATA PRODUCT
+      - heading "Stream-observed candles · volume unknown" [level=2]
+      - generic: 1m / UTC
+      - button "Yahoo interval OHLCV"
+      - button "Stream-observed candles" [active]
+      - button "Fetch BTC-USD intervals"
+      - paragraph: Built only from streaming observations received by this app. Coverage is partial and volume is unknown.
+      - figure "Stream-observed candlesticks; volume unknown":
+        - table:
+          - row:
+            - cell
+            - cell
+            - cell
+          - row:
+            - cell
+          - row "Charting by TradingView":
+            - cell
+            - cell "Charting by TradingView":
+              - link "Charting by TradingView":
+                - /url: https://www.tradingview.com/?utm_medium=lwc-link&utm_campaign=lwc-chart&utm_source=127.0.0.1/assignment4.html&utm_content=lwc-5.3.0
+            - cell
+          - row:
+            - cell
+            - cell
+            - cell
+        - button "Fit chart"
+      - text: Bars in view
+      - strong: "2"
+      - text: Retrieval age
+      - strong: 24.1s
+      - text: Interval state
+      - strong: forming
+      - text: Corrections
+      - strong: None recorded for latest
+      - paragraph: Application interval closure is not exchange finality. Reported zero volume is kept as zero; missing volume is a gap. Historical volume is never attached to stream-derived OHLC.
+  - generic "Persisted receipt trail cursor 17":
+    - text: Persisted receipt trail
+    - generic: cursor 17
+  - generic "Interval quality review 4 quarantined":
+    - text: Interval quality review
+    - generic: 4 quarantined
+  - text: FAILURE BEHAVIOR
+  - paragraph: Keep saved data visible when the feed cannot update.
+  - button "Simulate unavailable feed"
+  - status: Persisted source observations
+  - generic: Yahoo Finance via yfinance · educational, local demonstration · no trading or financial advice
+  - text: TradingView Lightweight Charts™ · Copyright (с) 2025 TradingView, Inc.
+  - link "TradingView":
+    - /url: https://www.tradingview.com/
+  - text: ·
+  - link "License & notices":
+    - /url: /assignment4-third-party-notices.txt
+- generic "Toggle devtools panel":
+- generic "Toggle Component Inspector":
