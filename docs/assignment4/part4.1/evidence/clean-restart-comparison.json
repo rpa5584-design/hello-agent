@@ -1,0 +1,19 @@
+{
+  "tested_commit": "3bb33315f23e9697ede34218040cdeea27696ecc",
+  "checks": {
+    "stream_cutoff": true,
+    "bar_cutoff": true,
+    "interval_bars": true,
+    "stream_candles": true,
+    "usage": true,
+    "offline": true,
+    "no_upstream": true,
+    "price_same": true
+  },
+  "counts": {
+    "receipts": 12,
+    "interval_receipts": 638,
+    "interval_versions": 318
+  },
+  "clean_status": ""
+}

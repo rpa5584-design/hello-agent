@@ -56,3 +56,15 @@ Codex implemented an explicit-session-owned bounded interval refresh loop, coope
 ## Live verification and reproducibility checkpoint - November14,2026
 
 Codex operated the actual browser for one83.259s BTC Yahoo session, captured initial/automatic identical OHLCV retrievals and stream updates, stopped source work, inspected the isolated DB read-only and captured replay/simulated-unavailable/refresh/restart evidence. It added a documented explicit-DB/no-reconnect/offline-recording launcher and tests, with no model calls. Evidence remains actual decoded public source records; no changing interval/volume bar is claimed. It reviewed the implementation/dependencies/redacted evidence for the authorized checkpoint commit; clean-checkout results and video status are documented separately after that commit. No push or root report overwrite.
+
+## Post-checkpoint reproducibility evidence - uncommitted review
+
+Commit3bb33315f23e9697ede34218040cdeea27696ecc was tested in a new independent local clone with fresh Python/npm installs and no copied environments/secrets/data.113 backend/126 frontend tests, lint/build/pip check passed. Actual offline browser/WS/replay/simulation/refresh/restart checks passed with zero Yahoo/model calls. Codex drafted clean-checkout.md and a precise55second manual recording handoff; no video was recorded/published and accessibility was not claimed. Post-commit verification docs/evidence remain uncommitted as requested.
+
+## Final report preparation — November 14, 2026
+
+Codex synthesized the final Assignment4 report from the committed live-source evidence, offline policy tests and clean-checkout observations, and reviewed the proposed remaining documentation/evidence inventory. It read the configured remote locally without contacting it. MP4 metadata confirms81.0seconds; the original user-retained video is unchanged and its duration noncompliance/public-access gaps are disclosed. Earlier statements that no video existed describe the earlier verification checkpoint. No application code, upstream request, commit or push occurred during report preparation; no independent full audiovisual review or public-access verification is claimed. Root Assignment3 report is preserved.
+
+## Authorized final publication review — November 14, 2026
+
+The author authorized committing the reviewed29-file submission and pushing only assignment4_part1 to origin without force. Codex reviewed the staged/text evidence and original video metadata/hash, played the unchanged MP4 locally and inspected visual samples. No credentials were visible in those samples; full-frame coverage and audio listening/transcription were unavailable and are not certified. GitHub repository access was checked without authentication; branch/report/evidence/video download checks follow the push. The assessed application commit remains3bb33315f23e9697ede34218040cdeea27696ecc; no self-referential final hash is invented. No Yahoo/model request, application change, video edit, visibility change or Canvas submission is part of publication.

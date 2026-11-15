@@ -1,0 +1,7 @@
+Browser tab: 2, Title: "Market Observatory | Assignment 4.1", URL: "http://127.0.0.1:5174/assignment4.html".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 37, 40, 73
++						99 text 690.4s
++						100 text 685.7s
++					101 text 698.2s
+The focused UI element is 1 AXWebArea Market Observatory | Assignment 4.1, URL: 127.0.0.1:5174/assignment4.html

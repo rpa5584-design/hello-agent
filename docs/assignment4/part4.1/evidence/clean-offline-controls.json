@@ -1,0 +1,14 @@
+{
+  "live/start": {
+    "status": 409,
+    "body": {
+      "detail": "Offline recorded-data mode: upstream access disabled"
+    }
+  },
+  "interval/fetch": {
+    "status": 409,
+    "body": {
+      "detail": "Offline recorded-data mode: upstream access disabled"
+    }
+  }
+}
