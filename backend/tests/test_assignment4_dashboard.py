@@ -217,14 +217,23 @@ def test_websocket_snapshot_replay_and_reconnect_no_automatic_source(tmp_path):
 
 
 def test_v2_additive_migration_preserves_receipts(store):
+    store.record_stream({"id": "BTC-USD", "time": BASE * 1000, "price": 105},
+                        AT, dict(EMPTY_CONTROL), dict(DEFAULT_USAGE))
     with connect(store.path) as c:
+        # The fixture starts from the current schema. Remove only the v3/v4 additions
+        # to reproduce the actual v2 layout before exercising the additive migration.
+        for table in ("backtest_trades", "backtest_runs", "paper_fills", "paper_bar_progress",
+                      "paper_positions", "paper_orders", "paper_account", "interval_receipts",
+                      "interval_versions", "interval_fetches", "dashboard_events", "dashboard_budget"):
+            c.execute(f"DROP TABLE {table}")
         c.execute("UPDATE metadata SET policy=?", (V2_POLICY,))
         c.execute("PRAGMA user_version=2")
     initialize(store.path)
     initialize(store.path)
     with connect(store.path,readonly=True) as c:
-        assert c.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert c.execute("PRAGMA user_version").fetchone()[0] == 4
         assert c.execute("PRAGMA foreign_key_check").fetchall() == []
+        assert c.execute("SELECT count(*) FROM receipts").fetchone()[0] == 1
 
 
 

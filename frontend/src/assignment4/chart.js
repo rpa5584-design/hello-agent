@@ -1,4 +1,5 @@
-import { createChart, CandlestickSeries, HistogramSeries } from 'lightweight-charts'
+import { createChart, CandlestickSeries, HistogramSeries, LineSeries, createSeriesMarkers } from 'lightweight-charts'
+import { calculateIndicators } from './indicators.js'
 
 export function seriesData(rows, product) {
   const values = new Map()
@@ -14,7 +15,26 @@ export function seriesData(rows, product) {
   return { candles: sorted.map((v) => v.candle), volume: sorted.map((v) => v.volume) }
 }
 
-export function mountChart(container, factory = createChart) {
+export function indicatorData(rows, fastWindow, slowWindow) {
+  const result = calculateIndicators(rows, fastWindow, slowWindow)
+  return {
+    fast: result.rows.filter((row) => row.fast_sma !== null)
+      .map((row) => ({ time: row.source_time_s, value: row.fast_sma })),
+    slow: result.rows.filter((row) => row.slow_sma !== null)
+      .map((row) => ({ time: row.source_time_s, value: row.slow_sma })),
+    markers: [...result.confirmedSignals, ...(result.provisionalSignal ? [result.provisionalSignal] : [])]
+      .map((signal) => ({ time: signal.source_time_s,
+        position: signal.signal === 'UP' ? 'belowBar' : 'aboveBar',
+        shape: signal.signal === 'UP' ? 'arrowUp' : 'arrowDown',
+        color: signal.signal_status === 'confirmed'
+          ? (signal.signal === 'UP' ? '#178252' : '#b5473d') : '#b17b19',
+      })),
+    confirmedSignals: result.confirmedSignals,
+    provisionalSignal: result.provisionalSignal,
+  }
+}
+
+export function mountChart(container, factory = createChart, markerFactory = createSeriesMarkers) {
   const chart = factory(container, {
     autoSize: true, height: 390,
     layout: { background: { color: '#fffefb' }, textColor: '#485b57', attributionLogo: true },
@@ -28,15 +48,21 @@ export function mountChart(container, factory = createChart) {
   }, 0)
   const volume = chart.addSeries(HistogramSeries, { priceFormat: { type: 'volume' },
     lastValueVisible: false, priceLineVisible: false }, 1)
+  const fast = chart.addSeries(LineSeries, { color: '#3d72a4', lineWidth: 2, title: 'SMA 5' })
+  const slow = chart.addSeries(LineSeries, { color: '#8b5da7', lineWidth: 2, title: 'SMA 20' })
+  const markers = markerFactory(candles, [])
   chart.panes()[0].setHeight(280)
   chart.panes()[1].setHeight(100)
   let loaded = false, removed = false, previousLength = 0
   return {
-    update(rows, product) {
+    update(rows, product, fastWindow = 5, slowWindow = 20) {
       if (removed) return
       const data = seriesData(rows, product)
+      const overlays = product === 'interval' ? indicatorData(rows, fastWindow, slowWindow) :
+        { fast: [], slow: [], markers: [] }
       const range = loaded ? chart.timeScale().getVisibleLogicalRange() : null
       candles.setData(data.candles); volume.setData(data.volume)
+      fast.setData(overlays.fast); slow.setData(overlays.slow); markers.setMarkers(overlays.markers)
       if (data.candles.length && !loaded) { chart.timeScale().fitContent(); loaded = true }
       else if (range) {
         const growth = data.candles.length - previousLength
@@ -47,7 +73,7 @@ export function mountChart(container, factory = createChart) {
       previousLength = data.candles.length
     },
     fit() { if (!removed) chart.timeScale().fitContent() },
-    remove() { if (!removed) { chart.remove(); removed = true } },
+    remove() { if (!removed) { markers.detach(); chart.remove(); removed = true } },
   }
 }
 

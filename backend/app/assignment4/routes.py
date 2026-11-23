@@ -77,6 +77,34 @@ async def unavailable_demo(request: Request) -> dict:
     return {"simulated": True, "source_requests": 0}
 
 
+@router.post("/paper/sync")
+def sync_paper_account(request: Request) -> dict:
+    return request.app.state.trading_store.sync()
+
+
+@router.get("/paper/account")
+def paper_account(request: Request) -> dict:
+    return request.app.state.trading_store.account()
+
+
+@router.post("/backtest")
+def run_backtest(body: HistoryBody, request: Request) -> dict:
+    try:
+        return request.app.state.trading_store.run_backtest(body.symbol)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from None
+
+
+@router.get("/backtest/{symbol}")
+def latest_backtest(symbol: str, request: Request) -> dict:
+    if symbol not in ("BTC-USD", "ETH-USD"):
+        raise HTTPException(422, "unsupported symbol")
+    result = request.app.state.trading_store.latest_backtest(symbol)
+    if result is None:
+        raise HTTPException(404, "No backtest has been run for this symbol")
+    return result
+
+
 @router.websocket("/ws")
 async def socket(websocket: WebSocket) -> None:
     if websocket.headers.get("origin") not in ORIGINS | {None}:

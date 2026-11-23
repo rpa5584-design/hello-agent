@@ -70,6 +70,11 @@ def legacy_database(path, yahoo=False):
     with connect(path) as conn:
         conn.execute("DROP INDEX observations_base_slot")
         conn.execute("ALTER TABLE observations DROP COLUMN base_slot_key")
+        # Recreate the v1 fixture rather than downgrading only its version number.
+        for table in ("backtest_trades", "backtest_runs", "paper_fills", "paper_bar_progress",
+                      "paper_positions", "paper_orders", "paper_account", "interval_receipts",
+                      "interval_versions", "interval_fetches", "dashboard_events", "dashboard_budget"):
+            conn.execute(f"DROP TABLE {table}")
         conn.execute("UPDATE metadata SET policy=?", (LEGACY_POLICY,))
         conn.execute("PRAGMA user_version=1")
         if yahoo:
@@ -85,7 +90,7 @@ def test_v1_fixture_migration_preserves_history_and_is_idempotent(tmp_path):
     assert store.snapshot() == before and store.receipts() == receipts
     assert store.replay()["candles"] == before["candles"]
     with connect(store.path, readonly=True) as conn:
-        assert conn.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert conn.execute("PRAGMA user_version").fetchone()[0] == 4
         assert conn.execute("SELECT policy FROM metadata").fetchone()[0] == POLICY
         assert conn.execute("PRAGMA foreign_key_check").fetchall() == []
 

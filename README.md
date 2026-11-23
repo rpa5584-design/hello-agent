@@ -246,3 +246,11 @@ Exact Windows PowerShell focused backend command (from backend/; Python does not
 ```
 
 Actual automatic-refresh evidence is now in [live verification](docs/assignment4/part4.1/live-refresh-verification.md): one83.259s BTC session,12 stream receipts,two automatic interval fetches. Both fetches returned unchanged valid OHLCV; no changing volume bar is claimed. Earlier manual-only evidence statuses above are historical.
+
+## Assignment 4.2 Part 2: SMA, paper trading, and backtesting
+
+The existing `/assignment4.html` dashboard now overlays 5-candle and 20-candle SMAs on saved Yahoo interval candles and marks crossovers. Completed-candle signals are confirmed; an unfinished candle can show a provisional signal, which never creates an order. Stream-observed candles remain separate and are not trading input.
+
+The local paper account starts with $10,000.00, buys up to $1,000.00 notional on an upward confirmed crossover when flat, and sells its long position on a downward confirmed crossover. Orders fill at the next available candle open. The dashboard displays orders, fills, cash, positions, realized/unrealized P&L, and equity. Run Backtest uses saved completed interval candles and the same SMA and execution rules; results and trades are stored in the Assignment 4 database. It is a local simulation and sends no real orders.
+
+The accounting, signal, migration, and no-look-ahead assumptions are in [Assignment 4.2 design](docs/assignment4/part4.2/design.md); actual verification results belong in [Assignment 4.2 verification](docs/assignment4/part4.2/verification.md). Schema 3 migrates additively to version 4. The app still uses the Assignment 4.1 isolated backend and port 8001 with the frontend on port 5174. No new environment variables are required. GitHub Actions runs the focused Assignment 4 backend tests, frontend tests, non-fixing linters, and production build on pushes and pull requests.

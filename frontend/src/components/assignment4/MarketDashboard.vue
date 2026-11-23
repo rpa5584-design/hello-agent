@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, shallowRef } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { createDashboardClient } from '../../assignment4/client.js'
 import { dashboardApi } from '../../assignment4/api.js'
 import { productLabel } from '../../assignment4/chart.js'
@@ -11,9 +11,14 @@ const product = ref('interval')
 const symbol = ref('BTC-USD')
 const busy = ref('')
 const actionError = ref('')
+const paperAccount = shallowRef(null)
+const backtestResult = shallowRef(null)
+const tradingBusy = ref(false)
+const backtestBusy = ref(false)
+const tradingError = ref('')
 const now = ref(Date.now())
 let timer
-onMounted(() => { client.connect(); timer = setInterval(() => { now.value = Date.now() }, 1000) })
+onMounted(() => { client.connect(); timer = setInterval(() => { now.value = Date.now() }, 1000); loadLatestBacktest() })
 onUnmounted(() => { clearInterval(timer); client.dispose() })
 const payload = computed(() => state.value.payload)
 const quote = computed(() => !state.value.pending && payload.value?.quotes?.[symbol.value])
@@ -37,6 +42,12 @@ const price = (value) => value === undefined ? '—' : new Intl.NumberFormat('en
   { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(value)
 const timestamp = (value) => value ? new Date(value).toISOString().replace('T', ' ').replace('.000Z', ' UTC') : 'Not received'
 const feed = computed(() => payload.value?.effective_feed || 'stopped')
+const indicator = computed(() => paperAccount.value?.indicators?.[symbol.value])
+const money = (cents) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+  .format((cents || 0) / 100)
+const accountMoney = (cents) => paperAccount.value ? money(cents) : tradingError.value ? 'Unavailable' : 'Loading…'
+const indicatorRowsSignature = computed(() => (payload.value?.interval_bars || [])
+  .map((bar) => `${bar.symbol}:${bar.source_time_s}:${bar.version_id}:${bar.app_completion}`).join('|'))
 const green = computed(() => state.value.connection === 'connected' && state.value.mode === 'live' && feed.value === 'receiving' && sourceAge.value !== null && sourceAge.value < 30)
 async function stopLive() {
   actionError.value = ''
@@ -50,18 +61,40 @@ async function action(name, operation) {
   catch (error) { actionError.value = error.message }
   finally { busy.value = '' }
 }
+async function loadPaperAccount() {
+  if (!payload.value || tradingBusy.value) return
+  tradingBusy.value = true; tradingError.value = ''
+  try {
+    if (state.value.mode === 'live') await dashboardApi.syncPaper()
+    paperAccount.value = await dashboardApi.paperAccount()
+  } catch (error) { tradingError.value = error.message }
+  finally { tradingBusy.value = false }
+}
+async function runSelectedBacktest() {
+  if (backtestBusy.value) return
+  backtestBusy.value = true; tradingError.value = ''
+  try { backtestResult.value = await dashboardApi.runBacktest(symbol.value) }
+  catch (error) { tradingError.value = error.message }
+  finally { backtestBusy.value = false }
+}
+async function loadLatestBacktest() {
+  try { backtestResult.value = await dashboardApi.latestBacktest(symbol.value) }
+  catch { backtestResult.value = null }
+}
+watch(() => [Boolean(payload.value), indicatorRowsSignature.value], () => loadPaperAccount())
+watch(symbol, () => { backtestResult.value = null; loadPaperAccount(); loadLatestBacktest() })
 </script>
 
 <template>
   <div class="observatory">
     <header class="topbar">
       <a class="wordmark" href="/assignment4.html"><span aria-hidden="true" class="mark">◉</span> MARKET OBSERVATORY</a>
-      <span class="local-tag">LOCALHOST <span aria-hidden="true">/</span> ASSIGNMENT 4.1</span>
+      <span class="local-tag">LOCALHOST <span aria-hidden="true">/</span> ASSIGNMENT 4.2</span>
     </header>
     <main>
       <section class="intro">
         <div><p class="eyebrow">A CLEAR VIEW OF THE SOURCE</p><h1>Watch the market.<br><em>Keep the context.</em></h1>
-          <p class="lead">Streaming price observations and reported interval bars.<br>Two products, with their differences kept visible.</p></div>
+          <p class="lead">Market data, simple moving averages, and a local paper-trading simulation.</p></div>
         <div class="mode-box">
           <span class="caption">VIEWING MODE</span>
           <div class="segmented" aria-label="Live or replay">
@@ -90,7 +123,7 @@ async function action(name, operation) {
         </div>
       </div>
       <p v-if="state.error || actionError" class="notice error" role="alert">{{ actionError || state.error }}</p>
-      <p v-if="payload?.control?.offline" class="notice" role="status"><strong>OFFLINE RECORDED DATA.</strong> Upstream access disabled. Saved Yahoo observations are not a current live feed.</p>
+      <p v-if="payload?.control?.offline" class="notice" role="status"><strong>OFFLINE RECORDED DATA.</strong> Upstream access disabled. {{ payload.control.reason || 'Saved observations are not a current live feed.' }}</p>
       <p v-if="payload?.control?.simulated" class="notice simulated" role="status"><strong>Simulated unavailable feed.</strong> No Yahoo request was made by this demonstration.</p>
 
       <section class="workspace" aria-label="Market data workspace">
@@ -135,7 +168,14 @@ async function action(name, operation) {
             <button :disabled="!!busy || payload?.control?.offline || state.mode === 'replay' || payload?.control?.history === 'fetching' || (usage.history_fetches || 0) >= 3 || usage.blocked" @click="action('Fetching intervals', () => dashboardApi.history(symbol))">Fetch {{ symbol }} intervals</button>
           </div>
           <p class="product-note">{{ product === 'interval' ? 'Polled snapshot: matching OHLC and volume from each Yahoo interval record. Volume units are provider-reported and unverified.' : 'Built only from streaming observations received by this app. Coverage is partial and volume is unknown.' }}</p>
-          <MarketChart :key="symbol + product" :rows="rows" :product="product" />
+          <MarketChart :key="symbol + product" :rows="rows" :product="product"
+            :fast-window="paperAccount?.fast_window || 5" :slow-window="paperAccount?.slow_window || 20" />
+          <p class="indicator-legend">SMA {{ paperAccount?.fast_window || 5 }} · blue
+            <span aria-hidden="true">; </span>SMA {{ paperAccount?.slow_window || 20 }} · purple.
+            <span v-if="indicator?.rows?.length">Latest: {{ indicator.rows.at(-1).fast_sma?.toFixed(4) ?? 'warming up' }} / {{ indicator.rows.at(-1).slow_sma?.toFixed(4) ?? 'warming up' }}</span>
+            <span class="signal-confirmed">Confirmed crossover · completed candle</span>
+            <span class="signal-provisional">Provisional crossover · unfinished candle</span>
+          </p>
           <div v-if="!rows.length" class="empty-chart" role="status">{{ state.pending ? 'Loading server snapshot…' : product === 'interval' ? 'No valid interval bars saved. Start live for bounded automatic refresh, or use Fetch intervals.' : 'No streamed candle data saved. Use Start live.' }}</div>
           <div class="chart-summary">
             <span>Bars in view <strong>{{ rows.length }}</strong></span>
@@ -154,6 +194,89 @@ async function action(name, operation) {
           </div>
           <p class="fine-print">Application interval closure is not exchange finality. Reported zero volume is kept as zero; missing volume is a gap. Historical volume is never attached to stream-derived OHLC.</p>
         </section>
+      </section>
+
+      <section class="trading-panel" aria-label="SMA signals and simulated trading">
+        <div class="panel-heading"><div><span class="caption">LOCAL SIMULATION</span>
+          <h2>Paper account · {{ symbol }}</h2></div>
+          <button :disabled="tradingBusy || !payload" @click="loadPaperAccount">{{ tradingBusy ? 'Updating…' : 'Update paper account' }}</button>
+        </div>
+        <p v-if="tradingError" class="notice error" role="alert">{{ tradingError }}</p>
+        <p class="fine-print">Confirmed crossover decisions use completed one-minute candles. Orders fill at the next candle open. Unfinished-candle signals are provisional and never place orders.</p>
+        <div v-if="indicator?.provisional_signal?.signal" class="notice provisional-notice" role="status">
+          PROVISIONAL {{ indicator.provisional_signal.signal }} crossover · unfinished candle · no order placed.
+        </div>
+        <div v-if="indicator?.confirmed_signals?.length" class="notice confirmed-notice" role="status">
+          Latest confirmed crossover: {{ indicator.confirmed_signals.at(-1).signal }} · completed candle at
+          {{ timestamp(indicator.confirmed_signals.at(-1).source_time_s * 1000) }}.
+        </div>
+        <p v-if="!paperAccount" class="empty-state" role="status">{{ tradingError ? 'Paper account signals unavailable.' : 'Loading crossover signals…' }}</p>
+        <p v-else-if="!indicator?.confirmed_signals?.length && !indicator?.provisional_signal?.signal" class="empty-state" role="status">
+          No crossover yet. The {{ paperAccount?.slow_window || 20 }}-bar SMA needs a full window first.
+        </p>
+        <div class="account-summary" aria-label="Account performance">
+          <div><span>Cash</span><strong>{{ accountMoney(paperAccount?.cash_cents) }}</strong></div>
+          <div><span>Realized P&amp;L</span><strong>{{ accountMoney(paperAccount?.realized_pnl_cents) }}</strong></div>
+          <div><span>Unrealized P&amp;L</span><strong>{{ accountMoney(paperAccount?.unrealized_pnl_cents) }}</strong></div>
+          <div><span>Account equity</span><strong>{{ accountMoney(paperAccount?.equity_cents) }}</strong></div>
+        </div>
+        <h3>Positions</h3>
+        <table v-if="paperAccount?.positions?.length" class="trading-table">
+          <thead><tr><th>Symbol</th><th>Quantity</th><th>Cost basis</th><th>Mark</th><th>Unrealized P&amp;L</th></tr></thead>
+          <tbody><tr v-for="position in paperAccount.positions" :key="position.symbol">
+            <td>{{ position.symbol }}</td><td>{{ position.quantity }}</td><td>{{ money(position.cost_cents) }}</td>
+            <td>{{ price(position.mark_price) }}</td><td>{{ money(position.unrealized_pnl_cents) }}</td>
+          </tr></tbody>
+        </table>
+        <p v-else-if="!paperAccount" class="empty-state" role="status">{{ tradingError ? 'Positions unavailable.' : 'Loading positions…' }}</p>
+        <p v-else class="empty-state">No open positions.</p>
+        <h3>Orders and fills</h3>
+        <table v-if="paperAccount?.orders?.length" class="trading-table">
+          <thead><tr><th>Order</th><th>Signal time</th><th>Status</th><th>Fill time</th><th>Fill price</th><th>Quantity</th></tr></thead>
+          <tbody><tr v-for="order in paperAccount.orders" :key="order.order_id">
+            <td>{{ order.side }}</td><td>{{ timestamp(order.signal_time_s * 1000) }}</td><td>{{ order.status }}</td>
+            <td>{{ timestamp(order.fill_time_s * 1000) }}</td><td>{{ price(order.fill_price) }}</td><td>{{ order.quantity || '—' }}</td>
+          </tr></tbody>
+        </table>
+        <p v-else-if="!paperAccount" class="empty-state" role="status">{{ tradingError ? 'Orders unavailable.' : 'Loading orders…' }}</p>
+        <p v-else class="empty-state">No paper orders or fills yet.</p>
+        <h3>Fill ledger</h3>
+        <table v-if="paperAccount?.fills?.length" class="trading-table">
+          <thead><tr><th>Side</th><th>Fill time</th><th>Price</th><th>Quantity</th><th>Value</th><th>Realized P&amp;L</th></tr></thead>
+          <tbody><tr v-for="fill in paperAccount.fills" :key="fill.fill_id">
+            <td>{{ fill.side }}</td><td>{{ timestamp(fill.fill_time_s * 1000) }}</td><td>{{ price(fill.fill_price) }}</td>
+            <td>{{ fill.quantity }}</td><td>{{ money(fill.notional_cents) }}</td><td>{{ money(fill.realized_pnl_cents) }}</td>
+          </tr></tbody>
+        </table>
+        <p v-else-if="!paperAccount" class="empty-state" role="status">{{ tradingError ? 'Fills unavailable.' : 'Loading fills…' }}</p>
+        <p v-else class="empty-state">No fills yet.</p>
+
+        <div class="backtest-block">
+          <div class="panel-heading"><div><h3>Historical backtest · {{ symbol }}</h3>
+            <p class="fine-print">All saved completed Yahoo interval candles · same SMA and next-open rules.</p></div>
+            <button :disabled="backtestBusy" @click="runSelectedBacktest">{{ backtestBusy ? 'Running…' : 'Run backtest' }}</button>
+          </div>
+          <div v-if="backtestResult" class="backtest-result" aria-label="Backtest results" role="region">
+            <p>{{ backtestResult.bar_count }} completed bars · {{ backtestResult.trades.length }} fills
+              <span v-if="backtestResult.pending_order"> · one order awaits the next candle open</span>
+            </p>
+            <div class="account-summary">
+              <div><span>Ending cash</span><strong>{{ money(backtestResult.ending_cash_cents) }}</strong></div>
+              <div><span>Realized P&amp;L</span><strong>{{ money(backtestResult.realized_pnl_cents) }}</strong></div>
+              <div><span>Unrealized P&amp;L</span><strong>{{ money(backtestResult.unrealized_pnl_cents) }}</strong></div>
+              <div><span>Equity</span><strong>{{ money(backtestResult.equity_cents) }}</strong></div>
+            </div>
+            <table v-if="backtestResult.trades.length" class="trading-table">
+              <thead><tr><th>Side</th><th>Signal time</th><th>Fill time</th><th>Fill price</th><th>Quantity</th><th>Realized P&amp;L</th></tr></thead>
+              <tbody><tr v-for="(trade, index) in backtestResult.trades" :key="index">
+                <td>{{ trade.side }}</td><td>{{ timestamp(trade.signal_time_s * 1000) }}</td>
+                <td>{{ timestamp(trade.fill_time_s * 1000) }}</td><td>{{ price(trade.fill_price) }}</td>
+                <td>{{ trade.quantity }}</td><td>{{ money(trade.realized_pnl_cents) }}</td>
+              </tr></tbody>
+            </table>
+            <p v-else class="empty-state">No completed crossover trades in this history window.</p>
+          </div>
+        </div>
       </section>
 
       <section class="evidence-row">
@@ -175,7 +298,7 @@ async function action(name, operation) {
         </div>
       </section>
       <p class="action-state" role="status">{{ busy ? busy + '…' : payload?.control?.reason || 'Waiting for backend snapshot.' }}</p>
-      <footer><span>Yahoo Finance via yfinance · educational, local demonstration · no trading or financial advice</span>
+      <footer><span>Yahoo Finance via yfinance · educational local simulation · no real orders or financial advice</span>
         <span>TradingView Lightweight Charts™ · Copyright (с) 2025 TradingView, Inc. <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer">TradingView</a> · <a href="/assignment4-third-party-notices.txt">License & notices</a></span>
       </footer>
     </main>
@@ -255,6 +378,25 @@ summary span { display: block; margin: 8px 0 0 12px; font-size: 10px; color: #7b
 .notice, .replay-banner { padding: 14px 18px; margin: 0 0 18px; border-radius: 8px; font-size: 12px; line-height: 1.6; }
 .error { background: #f7e6de; color: #914d3d; }
 .simulated, .replay-banner { background: #f4e9cf; color: #80642d; border: 1px solid #e5d5a5; }
+.trading-panel { margin-top: 20px; background: #fffefb; border: 1px solid #dce2d4; border-radius: 13px; padding: 22px 24px; }
+.panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.panel-heading h2, .panel-heading h3 { margin: 5px 0 8px; }
+.indicator-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px; color: #627264; }
+.signal-confirmed { color: #178252; font-weight: 700; }
+.signal-provisional { color: #9a6a12; font-weight: 700; }
+.provisional-notice { background: #fff5da; border-left: 3px solid #b17b19; }
+.confirmed-notice { background: #eaf5ec; border-left: 3px solid #178252; }
+.account-summary { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap: 10px; margin: 14px 0; }
+.account-summary div { background: #f2f4ec; border-radius: 7px; padding: 12px; }
+.account-summary span, .account-summary strong { display: block; }
+.account-summary span { color: #74816f; font-size: 11px; }
+.account-summary strong { color: #29483e; margin-top: 5px; font-variant-numeric: tabular-nums; }
+.trading-panel h3 { margin: 18px 0 8px; font-size: 14px; }
+.trading-table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 11px; white-space: nowrap; }
+.trading-table th, .trading-table td { text-align: left; padding: 9px 11px; border-bottom: 1px solid #e5e9df; }
+.trading-table th { color: #667e69; background: #f2f4ec; }
+.backtest-block { margin-top: 25px; border-top: 1px solid #e1e7dc; padding-top: 18px; }
+.backtest-result { margin-top: 12px; }
 .replay-banner > span { display: block; font-size: 11px; }
 .replay-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
 .replay-controls label { font-size: 10px; display: flex; gap: 10px; align-items: center; }
@@ -262,6 +404,6 @@ summary span { display: block; margin: 8px 0 0 12px; font-size: 10px; color: #7b
 .action-state { font-size: 11px; min-height: 18px; color: #6c7b62; margin: 18px 0; }
 footer { display: grid; gap: 8px; color: #8a9580; font-size: 9px; border-top: 1px solid #dce2d4; padding-top: 16px; line-height: 1.6; }
 footer a { color: #52705d; }
-@media (max-width: 1000px) { .workspace { grid-template-columns: 260px minmax(0,1fr); gap: 12px; } .chart-card { padding: 18px 14px; } .source-card { padding: 18px; } .evidence-row { grid-template-columns: 1fr 1fr; } .failure-demo { grid-column: 1 / -1; } }
-@media (max-width: 720px) { main { padding: 26px 16px; } .topbar { padding: 15px 16px; } .wordmark { font-size: 10px; letter-spacing: 1px; } .local-tag { display: none; } .intro { display: block; margin-bottom: 22px; } h1 { font-size: 36px; } .mode-box { text-align: left; margin-top: 24px; } .mode-box .segmented { display: inline-flex; } .workspace { grid-template-columns: 1fr; } .source-card { display: block; } .price { font-size: 34px; } .source-metadata { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 18px; } .source-metadata div { display: block; } dd { text-align: left; margin-top: 4px; } .usage { grid-template-columns: 1fr 1fr; column-gap: 22px; } .evidence-row { grid-template-columns: 1fr; } .chart-heading h2 { font-size: 20px; } .product-controls .segmented { display: flex; width: 100%; } .segmented button { padding: 8px; font-size: 11px; } }
+@media (max-width: 1000px) { .workspace { grid-template-columns: 1fr; gap: 12px; } .chart-card { padding: 18px 14px; } .source-card { padding: 18px; } .evidence-row { grid-template-columns: 1fr 1fr; } .failure-demo { grid-column: 1 / -1; } .account-summary { grid-template-columns: repeat(2, minmax(130px, 1fr)); } }
+@media (max-width: 720px) { main { padding: 26px 16px; } .topbar { padding: 15px 16px; } .wordmark { font-size: 10px; letter-spacing: 1px; } .local-tag { display: none; } .intro { display: block; margin-bottom: 22px; } h1 { font-size: 36px; } .mode-box { text-align: left; margin-top: 24px; } .mode-box .segmented { display: inline-flex; } .workspace { grid-template-columns: 1fr; } .source-card { display: block; } .price { font-size: 34px; } .source-metadata { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 18px; } .source-metadata div { display: block; } dd { text-align: left; margin-top: 4px; } .usage { grid-template-columns: 1fr 1fr; column-gap: 22px; } .evidence-row { grid-template-columns: 1fr; } .chart-heading h2 { font-size: 20px; } .product-controls .segmented { display: flex; width: 100%; } .segmented button { padding: 8px; font-size: 11px; } .trading-panel { padding: 16px 12px; } .account-summary { grid-template-columns: 1fr 1fr; gap: 7px; } }
 </style>

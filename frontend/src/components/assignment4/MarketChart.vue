@@ -2,11 +2,13 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { mountChart } from '../../assignment4/chart.js'
 
-const props = defineProps({ rows: { type: Array, default: () => [] }, product: { type: String, required: true } })
+const props = defineProps({ rows: { type: Array, default: () => [] }, product: { type: String, required: true },
+  fastWindow: { type: Number, default: 5 }, slowWindow: { type: Number, default: 20 } })
 const container = ref(null)
 let view
-onMounted(() => { view = mountChart(container.value); view.update(props.rows, props.product) })
-watch(() => [props.rows, props.product], () => view?.update(props.rows, props.product))
+onMounted(() => { view = mountChart(container.value); view.update(props.rows, props.product, props.fastWindow, props.slowWindow) })
+watch(() => [props.rows, props.product, props.fastWindow, props.slowWindow],
+  () => view?.update(props.rows, props.product, props.fastWindow, props.slowWindow), { deep: true })
 onUnmounted(() => { view?.remove(); view = null })
 </script>
 

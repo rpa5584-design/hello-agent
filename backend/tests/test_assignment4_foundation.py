@@ -264,7 +264,7 @@ def test_explicit_initialization_idempotent_and_policy_checked(tmp_path):
     assert MarketStore(path).snapshot() == before
     with connect(path) as connection:
         assert connection.execute("PRAGMA foreign_keys").fetchone()[0] == 1
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
         assert connection.execute("SELECT policy FROM metadata").fetchone()[0] == POLICY
         connection.execute("UPDATE metadata SET policy='unknown'")
     with pytest.raises(RuntimeError, match="policy"):

@@ -97,7 +97,7 @@ test('historical corrections replace complete sorted OHLCV records', () => {
 })
 
 test('chart creates two panes with attribution, updates both, and removes exactly once', () => {
-  const calls = [], series = [], paneHeights = []
+  const calls = [], series = [], paneHeights = [], markerCalls = []
   let removed = 0
   const fake = (_el, options) => {
     assert.equal(options.layout.attributionLogo, true)
@@ -110,13 +110,14 @@ test('chart creates two panes with attribution, updates both, and removes exactl
       remove() { removed++ },
     }
   }
-  const chart = mountChart({}, fake)
+  const chart = mountChart({}, fake, () => ({ setMarkers(value) { markerCalls.push(value) }, detach() {} }))
   chart.update(bars, 'interval')
-  assert.equal(series.length, 2)
+  assert.equal(series.length, 4)
   assert.deepEqual(paneHeights, [280, 100])
   assert.equal(calls[0].data.length, calls[1].data.length)
+  assert.equal(markerCalls.length, 1)
   chart.remove(); chart.remove(); chart.update(bars, 'interval')
-  assert.equal(removed, 1); assert.equal(calls.length, 2)
+  assert.equal(removed, 1); assert.equal(calls.length, 4)
 })
 
 async function component(name, dependencies) {
@@ -169,7 +170,7 @@ test('appended live-edge bars stay visible while a manually panned range is pres
     panes: () => [{ setHeight() {} }, { setHeight() {} }],
     timeScale: () => scale, remove() {},
   })
-  const view = mountChart({}, factory)
+  const view = mountChart({}, factory, () => ({ setMarkers() {}, detach() {} }))
   view.update(bars, 'interval')
   view.update([...bars, { ...bars[1], source_time_s: 240 }], 'interval')
   assert.deepEqual(applied.at(-1), { from: 1, to: 2 })

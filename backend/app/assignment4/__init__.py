@@ -8,6 +8,7 @@ from . import database
 from .dashboard import Dashboard
 from .routes import router
 from .services import MarketService
+from .trading_store import TradingStore
 
 
 def create_app(database_path: Path | None = None, *, adapter_factory=None,
@@ -29,5 +30,6 @@ def create_app(database_path: Path | None = None, *, adapter_factory=None,
     application = FastAPI(title="Assignment 4 Market Dashboard", lifespan=lifespan)
     application.state.database_path = path
     application.state.market_service = MarketService(path)
+    application.state.trading_store = TradingStore(path)
     application.include_router(router)
     return application
