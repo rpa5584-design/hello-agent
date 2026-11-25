@@ -57,3 +57,23 @@ Screenshots 01–04 are from the Edge session using the saved November 14, 2026 
 ## Outstanding verification limits
 
 The previous broader-suite stall did not reproduce: the full suite completed with 514 passes and one Conversation History teardown error (`hotel_assistant_prompt` restoration). That error is outside the Assignment 4 files and was not changed. The four Assignment 4 backend test files pass together (88 tests). The GitHub Actions file was reviewed and parsed locally; no `actionlint` binary or remote Actions run was available. Fresh live-feed behavior was intentionally not tested because the previous bounded provider allowance was exhausted. The provisional path was manually demonstrated with local synthetic data, not provider data. The no-overlap chart markers and no-zero loading state are covered by the frontend suite; the dense clustered-marker case was not separately recaptured after the text removal.
+
+## Final clean-checkout verification — November 23, 2026
+
+Verified commit: 558e185eb3e89e780423b07975e7a53781e7243c (Implement Assignment 4.2 SMA paper trading and backtesting).
+
+A separate detached worktree at C:\Users\alana\Desktop\RoomTour-Assignment4-clean-558e185 was created from that exact SHA. It started without a virtual environment, node_modules, or SQLite database. Python 3.13.7 and Node 24.20.0/npm 11.19.0 were available. A dedicated Python virtual environment was populated from backend/requirements-assignment4.txt; npm ci installed from the committed frontend lockfile. No dependency declarations were changed.
+
+| Input/action | Expected | Observed | Result / limit |
+| --- | --- | --- | --- |
+| Clean backend workflow suite over all Assignment 4 test modules plus test_assignment3_structure.py | Assignment 4 regressions pass from the exact commit | 123 passed in 8.89s | PASS |
+| Clean frontend command: node --test tests/*.test.js | Full browser/unit suite passes | 131 passed, 0 failed | PASS |
+| Clean dependency checks | Declared environment is usable | pip check: no broken requirements; npm ci: 226 packages added, 0 vulnerabilities reported | PASS |
+| Clean non-fixing linters and build | No lint errors; all application entries build | Oxlint and ESLint exit 0; Vite built Assignment 3, Assignment 4, and RoomTour | PASS |
+| Offline launcher with new isolated DB and saved recording | Show recorded data while preventing provider use | Browser displayed OFFLINE RECORDED DATA, 318 interval bars, SMA 5/20 values 67139.3984 / 67029.7047, and confirmed crossover status; history fetches 0 and provider HTTP calls 0 | PASS; historical recording, not live data |
+| Paper account browser state | Persistent account, position, and trade ledger render | Cash 899289 cents, realized −711 cents, unrealized −7 cents, equity 999282 cents; one position and 21 orders/fills; a 05:11 UTC BUY filled at the 05:12 UTC open | PASS |
+| Local backtest API then browser reload | Persisted result and trade history display | Run 1, 318 completed bars, 21 fills, cash 899289 cents, realized −711 cents, unrealized −7 cents, equity 999282 cents | PASS; the backtest was initiated by local API POST, then shown in browser |
+| Stop/restart backend with same offline DB | Account and backtest survive restart with no source access | The same account, position, 21 orders/fills, and run 1 result were returned; history fetches and provider HTTP calls stayed at 0 | PASS |
+| Stop owned frontend/backend and inspect ports/status | Only test-owned services stop; checkout remains clean | Both services stopped; no listeners on 8001/5174; detached checkout git status --porcelain empty | PASS |
+
+The clean checkout did not use the provisional synthetic fixture; that browser observation remains in the earlier manual verification table. No clean-checkout screenshot was captured. Vite emitted transient WebSocket ECONNRESET/ECONNREFUSED messages only while the owned backend was intentionally stopped; local requests succeeded after restart. This run does not verify live provider access, remote GitHub Actions, or a recorded submission video.
